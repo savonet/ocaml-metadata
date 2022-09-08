@@ -8,6 +8,11 @@ jobs:
     - uses: ocaml/setup-ocaml@v2
       with:
         ocaml-compiler: 4.14.0
-    - run: opam pin add -n .
-    - run: opam depext -yt metadata
-    - run: opam install -t .
+    - name: Install required packages
+      run: sudo apt install ffmpeg
+    - name: Pin package
+      run: opam pin add -n .
+    - name: Install dependencies
+      run: opam depext -yt metadata
+    - name: Build, test and install
+      run: opam install -t .
