@@ -10,7 +10,6 @@ homepage: "https://github.com/savonet/ocaml-metadata"
 bug-reports: "https://github.com/savonet/ocaml-metadata/issues"
 depends: [
   "dune" {>= "2.8"}
-  "unix"
   "odoc" {with-doc}
 ]
 build: [
