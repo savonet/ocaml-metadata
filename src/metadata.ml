@@ -1,14 +1,15 @@
-include MetadataBase
 module CharEncoding = MetadataCharEncoding
-module ID3v1 = MetadataID3v1
-module ID3v2 = MetadataID3v2
-module OGG = MetadataOGG
-module JPEG = MetadataJPEG
-module PNG = MetadataPNG
-module AVI = MetadataAVI
-module MP4 = MetadataMP4
 
 module Make(E : CharEncoding.T) = struct
+  include MetadataBase
+  module ID3v1 = MetadataID3v1
+  module ID3v2 = MetadataID3v2
+  module OGG = MetadataOGG
+  module JPEG = MetadataJPEG
+  module PNG = MetadataPNG
+  module AVI = MetadataAVI
+  module MP4 = MetadataMP4
+
   let recode = E.convert
 
   module ID3 = struct
