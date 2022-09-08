@@ -1,9 +1,9 @@
-name: Build doc
+name: Build documentation
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build_doc:
