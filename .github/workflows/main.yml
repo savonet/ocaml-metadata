@@ -7,7 +7,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ocaml/setup-ocaml@v2
       with:
-        ocaml-version: 4.14.0
+        ocaml-compiler: 4.14.0
     - run: opam pin add -n .
     - run: opam depext -yt metadata
     - run: opam install -t .
