@@ -59,6 +59,8 @@ module Make(E : CharEncoding.T) = struct
     let parse = first_valid parsers
     let parse_file = Reader.with_file parse
   end
+
+  include Any
 end
 
 include Make(CharEncoding.Naive)
