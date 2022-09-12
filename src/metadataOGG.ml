@@ -73,6 +73,7 @@ let parse f : metadata =
     ("vendor", vendor) :: comments
   in
   if peek 8 = "OpusHead" then (
+    R.drop f 8;
     (* version *)
     let v = R.uint8 f in
     if v <> 1 then raise Invalid;
