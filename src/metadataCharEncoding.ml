@@ -1,5 +1,5 @@
 module type T = sig
-  val convert : [`ISO8859 | `UTF8 | `UTF16 | `UTF16LE | `UTF16BE | `Auto] -> string -> string
+  val convert : [`ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE | `Auto] -> string -> string
 end
 
 module Naive : T = struct
