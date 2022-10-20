@@ -52,9 +52,9 @@ let normalize_id = function
   | id -> id
 
 let make_recode recode =
-  let recode = Option.value ~default:(fun ?from:_ s -> s) recode in
+  let recode = Option.value ~default:(fun ?source:_ s -> s) recode in
   let recode : int -> string -> string = function
-    | 0 -> recode ~from:`ISO_8859_1
+    | 0 -> recode ~source:`ISO_8859_1
     | 1 -> (
         fun s ->
           match String.length s with
@@ -62,12 +62,12 @@ let make_recode recode =
           | n when n < 2 -> s
           | n -> (
               match String.sub s 0 2 with
-              | "\255\246" -> recode ~from:`UTF_16LE (String.sub s 2 (n - 2))
-              | "\246\255" -> recode ~from:`UTF_16BE (String.sub s 2 (n - 2))
+              | "\255\246" -> recode ~source:`UTF_16LE (String.sub s 2 (n - 2))
+              | "\246\255" -> recode ~source:`UTF_16BE (String.sub s 2 (n - 2))
               (* Probably invalid string *)
-              | _ -> recode ~from:`UTF_16 s))
-    | 2 -> recode ~from:`UTF_16
-    | 3 -> recode ~from:`UTF_8
+              | _ -> recode ~source:`UTF_16 s))
+    | 2 -> recode ~source:`UTF_16
+    | 3 -> recode ~source:`UTF_8
     (* Invalid encoding. *)
     | _ -> fun s -> s
   in
