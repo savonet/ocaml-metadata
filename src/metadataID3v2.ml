@@ -107,7 +107,7 @@ let parse ?recode f : metadata =
       let id = R.read f (min !len id_len) in
       if id = "\000\000\000\000" || id = "\000\000\000" then len := 0
       (* stop tag *)
-      else (
+      else
         let size = read_frame_size f in
         (* make sure that we remain within the bounds in case of a problem *)
         let size = min size (!len - 10) in
@@ -126,12 +126,13 @@ let parse ?recode f : metadata =
         in
         if compressed || encrypted then raise Exit;
         let len = String.length data in
-        if id.[0] = 'T' && id <> "TXXX" && len >= 1 then (
+        if id.[0] = 'T' && id <> "TXXX" && len >= 1 then
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
-          tags :=
-            (normalize_id id, recode (String.sub data 1 (len - 1))) :: !tags)
-        else tags := (normalize_id id, data) :: !tags)
+          let data = String.sub data 1 (len - 1) |> recode in
+          tags := (normalize_id id, data) :: !tags
+        else
+          tags := (normalize_id id, data) :: !tags
     with Exit -> ()
   done;
   List.rev !tags
