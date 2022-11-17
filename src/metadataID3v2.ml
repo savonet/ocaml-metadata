@@ -1,6 +1,18 @@
 open MetadataBase
 module R = Reader
 
+module String = struct
+  include String
+
+  let replace_first s c c' =
+    let k = index_opt s c in
+    String.mapi (fun i c -> if Some i = k then c' else c) s
+
+  let split_on_first_char s c =
+    let i = String.index s c in
+    String.sub s 0 i, String.sub s (i+1) (String.length s - (i+1))
+end
+
 let read_size ~synch_safe f =
   let s = R.read f 4 in
   let s0 = int_of_char s.[0] in
@@ -19,15 +31,12 @@ let read_size_v2 f =
   let s2 = int_of_char s.[2] in
   (s0 lsl 16) + (s1 lsl 8) + s2
 
-let rec trim_eos ?(from = 0) enc s =
-  match (enc, String.index_from_opt s from '\000') with
-  | 0, Some n -> String.sub s 0 n
-  | (1, Some n | 2, Some n | 3, Some n)
-    when String.length s > n + 1 && s.[n + 1] = '\000' ->
-    String.sub s 0 n
-  | 1, Some n | 2, Some n | 3, Some n -> trim_eos ~from:(n + 1) enc s
-  (* Probably invalid string *)
-  | _ -> s
+let unterminate s =
+  let n = ref (String.length s) in
+  while !n > 0 && s.[!n-1] = '\000' do
+    decr n
+  done;
+  String.sub s 0 !n
 
 let normalize_id = function
   | "COMM" -> "comment"
@@ -71,7 +80,7 @@ let make_recode recode =
     (* Invalid encoding. *)
     | _ -> fun s -> s
   in
-  fun encoding s -> recode encoding (trim_eos encoding s)
+  fun encoding s -> recode encoding (unterminate s)
 
 (** Parse ID3v2 tags. *)
 let parse ?recode f : metadata =
@@ -126,7 +135,15 @@ let parse ?recode f : metadata =
         in
         if compressed || encrypted then raise Exit;
         let len = String.length data in
-        if id.[0] = 'T' && id <> "TXXX" && len >= 1 then
+        if id = "TXXX" then
+          let encoding = int_of_char data.[0] in
+          let data = String.sub data 1 (len - 1) in
+          let recode = recode encoding in
+          let id, data = String.split_on_first_char data '\000' in
+          let id = recode id in
+          let data = recode data in
+          tags := (id, data) :: !tags
+        else if id.[0] = 'T' && len >= 1 then
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in
