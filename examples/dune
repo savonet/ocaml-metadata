@@ -1,7 +1,7 @@
 (executable
  (name meta)
  (modules meta)
- (libraries metadata))
+ (libraries str metadata))
 
 (executable
  (name dump)
@@ -24,9 +24,25 @@
   test.mp4
   test.mkv
   test.webm
-  test.wav)
+  test.wav
+  id3v2/230_compressed_frames.tag
+  id3v2/230_unsynced_tag.tag
+  id3v2/240_prepended.tag
+  id3v2/240_text_encodings.tag
+  id3v2/liquidsoap2453.tag
+  id3v2/230_compressed_frames_unsynced_tag.tag
+  id3v2/240_compressed_frames_unsynced_frames.tag
+  id3v2/240_split.tag
+  id3v2/liquidsoap2453-2.tag
+  id3v2/liquidsoap2738.tag
+ )
  (action
-  (run ./test.exe)))
+  (progn
+   (run ./test.exe)
+   (run ./meta.exe id3v2/*.tag)
+  )
+ )
+)
 
 (rule
  (target test.mp3)

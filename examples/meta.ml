@@ -22,6 +22,22 @@ let () =
   if fname = [] then (
     Printf.eprintf "Please enter a filename.\n%!";
     exit 1);
+  let fname =
+    List.map
+      (fun f ->
+         if String.contains f '*' then
+           let d = Filename.dirname f in
+           let f = Filename.basename f |> Str.global_replace (Str.regexp "\\*") ".*" |> Str.regexp in
+           let files =
+             Sys.readdir d
+             |> Array.to_list
+             |> List.filter (fun s -> Str.string_match f s 0)
+           in
+           List.map (fun f -> d ^ "/" ^ f) files
+         else [f]
+      ) fname
+    |> List.flatten
+  in
   List.iter
     (fun fname ->
       Printf.printf "\n# %s\n\n%!" fname;
