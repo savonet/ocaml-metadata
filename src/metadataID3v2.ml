@@ -136,6 +136,20 @@ let parse ?recode f : metadata =
 
 let parse_file = R.with_file parse
 
+(** Dump ID3v2 header. *)
+let dump f =
+  let id = R.read f 3 in
+  if id <> "ID3" then raise Invalid;
+  let v1 = R.byte f in
+  let _v2 = R.byte f in
+  if not (List.mem v1 [2; 3; 4]) then raise Invalid;
+  let _flags = R.byte f in
+  let size = read_size ~synch_safe:true f in
+  R.reset f;
+  R.read f (10 + size)
+
+let dump_file = R.with_file dump
+
 (** APIC data. *)
 type apic = {
   mime : string;

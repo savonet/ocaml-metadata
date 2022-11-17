@@ -4,6 +4,11 @@
  (libraries metadata))
 
 (executable
+ (name dump)
+ (modules dump)
+ (libraries metadata))
+
+(executable
  (name test)
  (modules test)
  (optional)

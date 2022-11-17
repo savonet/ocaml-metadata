@@ -20,7 +20,7 @@ let () =
   in
   let fname = !fname in
   if fname = [] then (
-    Printf.eprintf "Please enter a filename.";
+    Printf.eprintf "Please enter a filename.\n%!";
     exit 1);
   List.iter
     (fun fname ->
