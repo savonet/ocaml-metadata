@@ -102,7 +102,9 @@ let parse ?recode f : metadata =
   let tags = ref [] in
   while !len > 0 do
     try
-      let id = R.read f id_len in
+      (* We can have 3 null bytes in the end even if id is 4 bytes. *)
+      let id_len = min !len id_len in
+      let id = R.read f (min !len id_len) in
       if id = "\000\000\000\000" || id = "\000\000\000" then len := 0
       (* stop tag *)
       else (
