@@ -1,2 +1,2 @@
 #!/bin/sh
-dune exec ./meta.exe -- $@
+dune exec --no-print-directory ./meta.exe -- $@
