@@ -143,7 +143,7 @@ let parse ?recode f : metadata =
           let id = recode id in
           let data = recode data in
           tags := (id, data) :: !tags
-        else if id.[0] = 'T' && len >= 1 then
+        else if (id.[0] = 'T' || id = "COMM") && len >= 1 then
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in

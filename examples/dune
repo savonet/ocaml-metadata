@@ -26,11 +26,9 @@
   test.webm
   test.wav
   id3v2/230_compressed_frames.tag
-  id3v2/230_unsynced_tag.tag
   id3v2/240_prepended.tag
   id3v2/240_text_encodings.tag
   id3v2/liquidsoap2453.tag
-  id3v2/230_compressed_frames_unsynced_tag.tag
   id3v2/240_compressed_frames_unsynced_frames.tag
   id3v2/240_split.tag
   id3v2/liquidsoap2453-2.tag
