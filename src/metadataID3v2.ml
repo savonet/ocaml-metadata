@@ -132,7 +132,7 @@ let parse ?recode f : metadata =
         else tags := (normalize_id id, data) :: !tags)
     with Exit -> ()
   done;
-  !tags
+  List.rev !tags
 
 let parse_file = R.with_file parse
 
