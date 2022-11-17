@@ -71,8 +71,8 @@ let make_recode recode =
           | n when n < 2 -> s
           | n -> (
               match String.sub s 0 2 with
-              | "\255\246" -> recode ~source:`UTF_16LE (String.sub s 2 (n - 2))
-              | "\246\255" -> recode ~source:`UTF_16BE (String.sub s 2 (n - 2))
+              | "\255\254" | "\255\246" -> recode ~source:`UTF_16LE (String.sub s 2 (n - 2))
+              | "\254\255" | "\246\255" -> recode ~source:`UTF_16BE (String.sub s 2 (n - 2))
               (* Probably invalid string *)
               | _ -> recode ~source:`UTF_16 s))
     | 2 -> recode ~source:`UTF_16
