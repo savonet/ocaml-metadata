@@ -31,12 +31,13 @@ let read_size_v2 f =
   let s2 = int_of_char s.[2] in
   (s0 lsl 16) + (s1 lsl 8) + s2
 
-let unterminate s =
-  let n = ref (String.length s) in
-  while !n > 0 && s.[!n-1] = '\000' do
-    decr n
-  done;
-  String.sub s 0 !n
+(** Remove trailing nulls. *)
+let unterminate encoding s =
+  let n = String.length s in
+  match encoding with
+  | 0 | 3 -> if String.length s > 0 && s.[n-1] = '\000' then String.sub s 0 (n-1) else s
+  | 1 | 2 -> if String.length s >= 2 && s.[n-1] = '\000' && s.[n-2] = '\000' then String.sub s 0 (n-2) else s
+  | _ -> failwith (Printf.sprintf "Unknown encoding: %d." encoding)
 
 let normalize_id = function
   | "COMM" -> "comment"
@@ -80,7 +81,7 @@ let make_recode recode =
     (* Invalid encoding. *)
     | _ -> fun s -> s
   in
-  fun encoding s -> recode encoding (unterminate s)
+  fun encoding s -> recode encoding (unterminate encoding s)
 
 (** Parse ID3v2 tags. *)
 let parse ?recode f : metadata =
