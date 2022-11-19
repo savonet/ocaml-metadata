@@ -158,14 +158,22 @@ let parse ?recode f : metadata =
           let data = String.sub data 1 (len - 1) in
           let recode = recode encoding in
           let id, data =
-            let n = try next_substring encoding data with Not_found -> 0 in
+            let n = next_substring encoding data in
             String.sub data 0 n,
             String.sub data n (String.length data - n)
           in
           let id = recode id in
           let data = recode data in
           tags := (id, data) :: !tags
-        else if (id.[0] = 'T' || id = "COMM") && len >= 1 then
+        else if id = "COMM" then
+          let encoding = int_of_char data.[0] in
+          let recode = recode encoding in
+          let data = String.sub data 1 (len - 1) in
+          (* We ignore the language description of the comment. *)
+          let n = try next_substring encoding data with Not_found -> 0 in
+          let data = String.sub data n (String.length data - n) |> recode in
+          tags := ("comment", data) :: !tags
+        else if id.[0] = 'T' || id = "COMM" then
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in
