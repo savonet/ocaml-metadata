@@ -1,18 +1,6 @@
 open MetadataBase
 module R = Reader
 
-module String = struct
-  include String
-
-  let replace_first s c c' =
-    let k = index_opt s c in
-    String.mapi (fun i c -> if Some i = k then c' else c) s
-
-  let split_on_first_char s c =
-    let i = String.index s c in
-    String.sub s 0 i, String.sub s (i+1) (String.length s - (i+1))
-end
-
 let read_size ~synch_safe f =
   let s = R.read f 4 in
   let s0 = int_of_char s.[0] in
