@@ -136,7 +136,8 @@ let parse ?recode f : metadata =
         in
         if compressed || encrypted then raise Exit;
         let len = String.length data in
-        if id = "TXXX" then
+        if List.mem id ["SEEK"] then ()
+        else if id = "TXXX" then
           let encoding = int_of_char data.[0] in
           let data = String.sub data 1 (len - 1) in
           let recode = recode encoding in

@@ -6,7 +6,7 @@ test:
 	@dune test
 
 id3v2:
-	@for i in id3v2/*.tag; do \
+	@for i in id3v2/*.mp3; do \
 	  echo; echo Testing $$i; echo; \
 	  $(META) "$$i"; \
 	done
