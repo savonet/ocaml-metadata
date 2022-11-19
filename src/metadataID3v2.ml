@@ -141,7 +141,30 @@ let parse ?recode f : metadata =
           let encoding = int_of_char data.[0] in
           let data = String.sub data 1 (len - 1) in
           let recode = recode encoding in
-          let id, data = String.split_on_first_char data '\000' in
+          let n =
+            let ans = ref 0 in
+            try
+              for i = 0 to String.length data - (if encoding = 2 || encoding = 3 then 2 else 1) do
+                if encoding = 2 || encoding = 3 then
+                  if data.[i] = '\000' && data.[i+1] = '\000' then
+                    (
+                      ans := i + 2;
+                      raise Exit
+                    )
+                  else if data.[i] = '\000' then
+                    (
+                      ans := i + 1;
+                      raise Exit
+                    )
+              done;
+              0
+            with
+            | Exit -> !ans
+          in
+          let id, data =
+            String.sub data 0 n,
+            String.sub data n (String.length data - n)
+          in
           let id = recode id in
           let data = recode data in
           tags := (id, data) :: !tags
