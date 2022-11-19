@@ -25,20 +25,20 @@
   test.mkv
   test.webm
   test.wav
-  id3v2/230_compressed_frames.tag
-  id3v2/240_prepended.tag
-  id3v2/240_text_encodings.tag
-  id3v2/liquidsoap2453.tag
-  id3v2/240_compressed_frames_unsynced_frames.tag
-  id3v2/240_split.tag
-  id3v2/liquidsoap2453-2.tag
-  id3v2/liquidsoap2738.tag
-  id3v2/liquidsoap2738-2.tag
+  id3v2/230_compressed_frames.mp3
+  id3v2/240_prepended.mp3
+  id3v2/240_text_encodings.mp3
+  id3v2/liquidsoap2453.mp3
+  id3v2/240_compressed_frames_unsynced_frames.mp3
+  id3v2/240_split.mp3
+  id3v2/liquidsoap2453-2.mp3
+  id3v2/liquidsoap2738.mp3
+  id3v2/liquidsoap2738-2.mp3
  )
  (action
   (progn
    (run ./test.exe)
-   (run ./meta.exe id3v2/*.tag)
+   (run ./meta.exe id3v2/*.mp3)
   )
  )
 )
