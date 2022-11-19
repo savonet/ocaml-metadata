@@ -33,6 +33,7 @@
   id3v2/240_split.tag
   id3v2/liquidsoap2453-2.tag
   id3v2/liquidsoap2738.tag
+  id3v2/liquidsoap2738-2.tag
  )
  (action
   (progn
