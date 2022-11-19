@@ -27,6 +27,34 @@ let unterminate encoding s =
   | 1 | 2 -> if String.length s >= 2 && s.[n-1] = '\000' && s.[n-2] = '\000' then String.sub s 0 (n-2) else s
   | _ -> failwith (Printf.sprintf "Unknown encoding: %d." encoding)
 
+(** Find the index of the substring after the first null-terminated
+    substring. *)
+let next_substring encoding ?(offset=0) s =
+  let ans = ref 0 in
+  let utf16 = encoding = 1 || encoding = 2 in
+  try
+    for i = offset to String.length s - (if utf16 then 2 else 1) do
+      if utf16 then
+        (
+          if s.[i] = '\000' && s.[i+1] = '\000' then
+            (
+              ans := i + 2;
+              raise Exit
+            )
+        )
+      else
+        (
+          if s.[i] = '\000' then
+            (
+              ans := i + 1;
+              raise Exit
+            )
+        )
+    done;
+    raise Not_found
+  with
+  | Exit -> !ans
+
 let normalize_id = function
   | "COMM" -> "comment"
   | "TALB" -> "album"
@@ -129,27 +157,8 @@ let parse ?recode f : metadata =
           let encoding = int_of_char data.[0] in
           let data = String.sub data 1 (len - 1) in
           let recode = recode encoding in
-          let n =
-            let ans = ref 0 in
-            try
-              for i = 0 to String.length data - (if encoding = 2 || encoding = 3 then 2 else 1) do
-                if encoding = 2 || encoding = 3 then
-                  if data.[i] = '\000' && data.[i+1] = '\000' then
-                    (
-                      ans := i + 2;
-                      raise Exit
-                    )
-                  else if data.[i] = '\000' then
-                    (
-                      ans := i + 1;
-                      raise Exit
-                    )
-              done;
-              0
-            with
-            | Exit -> !ans
-          in
           let id, data =
+            let n = try next_substring encoding data with Not_found -> 0 in
             String.sub data 0 n,
             String.sub data n (String.length data - n)
           in
