@@ -42,7 +42,7 @@ let () =
   in
   List.iter
     (fun fname ->
-      Printf.printf "\n# %s\n\n%!" fname;
+      Printf.printf "\n# Metadata for %s\n\n%!" fname;
       let m = parser fname in
       List.iter
         (fun (k, v) ->

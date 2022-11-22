@@ -22,22 +22,15 @@
   test.jpg
   test.avi
   test.mp4
-  test.mkv
-  test.webm
+  ; test.mkv
+  ; test.webm
   test.wav
-  id3v2/230_compressed_frames.mp3
-  id3v2/240_prepended.mp3
-  id3v2/240_text_encodings.mp3
-  id3v2/liquidsoap2453.mp3
-  id3v2/240_split.mp3
-  id3v2/liquidsoap2453-2.mp3
-  id3v2/liquidsoap2738.mp3
-  id3v2/liquidsoap2738-2.mp3
+  (glob_files id3v2/*.mp3)
  )
  (action
   (progn
    (run ./test.exe)
-   (run ./meta.exe id3v2/*.mp3)
+   (run ./meta.exe %{deps})
   )
  )
 )
