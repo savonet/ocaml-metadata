@@ -78,7 +78,7 @@ let normalize_id = function
   | id -> id
 
 let make_recode recode =
-  let recode = Option.value ~default:(fun ?source:_ s -> s) recode in
+  let recode = Option.value ~default:MetadataCharEncoding.Naive.convert recode in
   let recode : int -> string -> string = function
     | 0 -> recode ~source:`ISO_8859_1
     | 1 -> (
@@ -184,7 +184,7 @@ let parse ?recode f : metadata =
   done;
   List.rev !tags
 
-let parse_file = R.with_file parse
+let parse_file ?recode = R.with_file (parse ?recode)
 
 (** Dump ID3v2 header. *)
 let dump f =

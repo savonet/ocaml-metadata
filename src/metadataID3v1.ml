@@ -7,7 +7,7 @@ let trim s =
   | None -> s
 
 (** Parse ID3v1 tags. *)
-let parse ?(recode=fun ?source:_ s -> s) f : metadata =
+let parse ?(recode=MetadataCharEncoding.Naive.convert) f : metadata =
   let size = match R.size f with Some n -> n | None -> raise Invalid in
   R.drop f (size - 128);
   if R.read f 3 <> "TAG" then raise Invalid;

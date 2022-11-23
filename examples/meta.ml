@@ -14,7 +14,7 @@ let () =
     match !format with
       | "id3" | "mp3" -> Metadata.ID3.parse_file
       | "id3v1" -> Metadata.ID3v1.parse_file
-      | "id3v2" -> Metadata.ID3v2.parse_file
+      | "id3v2" -> fun f -> Metadata.ID3v2.parse_file f
       | "ogg" -> Metadata.OGG.parse_file
       | "mp4" -> Metadata.MP4.parse_file
       | "" -> Metadata.Any.parse_file
