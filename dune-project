@@ -2,7 +2,7 @@
 (version 0.1.0)
 (name metadata)
 (source (github savonet/ocaml-metadata))
-(license GPL-3.0)
+(license GPL-3.0-or-later)
 (authors "Samuel Mimram <smimram@gmail.com>")
 (maintainers "Samuel Mimram <smimram@gmail.com>")
 
@@ -14,5 +14,6 @@
  (description "A pure OCaml library for reading files from various formats.")
  (depends
    (ocaml (>= 4.14.0))
+   (conf-ffmpeg :with-test)
  )
 )
