@@ -1,4 +1,4 @@
-(lang dune 2.8)
+(lang dune 3.6)
 (version 0.1.0)
 (name metadata)
 (source (github savonet/ocaml-metadata))

@@ -27,17 +27,20 @@ let () =
   let fname =
     List.map
       (fun f ->
-         if String.contains f '*' then
-           let d = Filename.dirname f in
-           let f = Filename.basename f |> Str.global_replace (Str.regexp "\\*") ".*" |> Str.regexp in
-           let files =
-             Sys.readdir d
-             |> Array.to_list
-             |> List.filter (fun s -> Str.string_match f s 0)
-           in
-           List.map (fun f -> d ^ "/" ^ f) files
-         else [f]
-      ) fname
+        if String.contains f '*' then (
+          let d = Filename.dirname f in
+          let f =
+            Filename.basename f
+            |> Str.global_replace (Str.regexp "\\*") ".*"
+            |> Str.regexp
+          in
+          let files =
+            Sys.readdir d |> Array.to_list
+            |> List.filter (fun s -> Str.string_match f s 0)
+          in
+          List.map (fun f -> d ^ "/" ^ f) files)
+        else [f])
+      fname
     |> List.flatten
   in
   List.iter
@@ -46,9 +49,10 @@ let () =
       let m = parser fname in
       List.iter
         (fun (k, v) ->
-          let v = if k = "APIC" || k = "PIC" || k = "RVA2" then "<redacted>" else v in
+          let v =
+            if k = "APIC" || k = "PIC" || k = "RVA2" then "<redacted>" else v
+          in
           Printf.printf "- %s: %s\n%!" k v;
-          if !binary then Printf.printf "  %s: %S\n%!" k v
-        )
+          if !binary then Printf.printf "  %s: %S\n%!" k v)
         m)
     fname

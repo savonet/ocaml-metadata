@@ -25,15 +25,11 @@
   ; test.mkv
   ; test.webm
   test.wav
-  (glob_files id3v2/*.mp3)
- )
+  (glob_files id3v2/*.mp3))
  (action
   (progn
    (run ./test.exe)
-   (run ./meta.exe %{deps})
-  )
- )
-)
+   (run ./meta.exe %{deps}))))
 
 (rule
  (target test.mp3)
