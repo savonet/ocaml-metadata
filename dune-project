@@ -13,7 +13,7 @@
  (synopsis "Read metadata from various file formats")
  (description "A pure OCaml library for reading files from various formats.")
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.13.0))
    (conf-ffmpeg :with-test)
  )
 )
