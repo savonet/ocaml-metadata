@@ -10,7 +10,7 @@ homepage: "https://github.com/savonet/ocaml-metadata"
 bug-reports: "https://github.com/savonet/ocaml-metadata/issues"
 depends: [
   "dune" {>= "3.6"}
-  "ocaml" {>= "4.13.0"}
+  "ocaml" {>= "4.14.0"}
   "conf-ffmpeg" {with-test}
   "odoc" {with-doc}
 ]
