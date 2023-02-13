@@ -3,7 +3,6 @@
  (libraries metadata))
 
 (rule
- (alias runtest)
- (enabled_if %{bin-available:ffmpeg})
+ (alias citest)
  (action
   (run ./test.exe)))
