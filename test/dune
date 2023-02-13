@@ -4,5 +4,6 @@
 
 (rule
  (alias runtest)
+ (enabled_if %{bin-available:ffmpeg})
  (action
   (run ./test.exe)))
