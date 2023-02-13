@@ -15,7 +15,7 @@
  (libraries metadata))
 
 (rule
- (alias runtest)
+ (alias citest)
  (deps
   test.mp3
   test.png
