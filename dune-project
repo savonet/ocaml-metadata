@@ -14,6 +14,5 @@
  (description "A pure OCaml library for reading files from various formats.")
  (depends
    (ocaml (>= 4.14.0))
-   (conf-ffmpeg :with-test)
  )
 )
