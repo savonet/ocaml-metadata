@@ -34,8 +34,9 @@ let parse f : metadata =
         done;
         R.drop f (len - !n)
       | 6 ->
+        (* Picture *)
         let picture = R.read f len in
-        tags := ("picture", picture) :: !tags
+        tags := ("PICTURE", picture) :: !tags
       | _ -> R.drop f len
     );
     if not last then block ()
@@ -44,3 +45,39 @@ let parse f : metadata =
   List.rev !tags
 
 let parse_file = R.with_file parse
+
+type picture = {
+  picture_type : int;
+  picture_mime : string;
+  picture_description : string;
+  picture_width : int;
+  picture_height : int;
+  picture_bpp : int;
+  picture_colors : int;
+  picture_data : string
+}
+
+let parse_picture p =
+  let n = ref 0 in
+  let int () =
+    let ans = int_of_char p.[!n] lsl 24 + int_of_char p.[!n+1] lsl 16 + int_of_char p.[!n+2] lsl 8 + int_of_char p.[!n+3] in
+    n := !n + 4;
+    ans
+  in
+  let string len =
+    let ans = String.sub p !n len in
+    n := !n + len;
+    ans
+  in
+  let picture_type = int () in
+  let mime_len = int () in
+  let mime = string mime_len in
+  let desc_len = int () in
+  let desc = string desc_len in
+  let width = int () in
+  let height = int () in
+  let bpp = int () in
+  let colors = int () in
+  let len = int () in
+  let data = string len in
+  { picture_type ; picture_mime = mime; picture_description = desc; picture_width = width; picture_height = height; picture_bpp = bpp; picture_colors = colors; picture_data = data }
