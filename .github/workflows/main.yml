@@ -9,7 +9,7 @@ jobs:
       with:
         ocaml-compiler: 4.14.0
     - name: Install required packages
-      run: sudo apt install ocaml-dune ffmpeg
+      run: sudo apt install ffmpeg
     - name: Pin package
       run: opam pin add -n .
     - name: Install dependencies
@@ -17,4 +17,4 @@ jobs:
     - name: Build and install
       run: opam install -t .
     - name: Run tests
-      run: dune build @citest
+      run: eval $(opam env) && dune build @citest
