@@ -36,7 +36,7 @@ let parse f : metadata =
       | 6 ->
         (* Picture *)
         let picture = R.read f len in
-        tags := ("PICTURE", picture) :: !tags
+        tags := ("metadata_block_picture", picture) :: !tags
       | _ -> R.drop f len
     );
     if not last then block ()
