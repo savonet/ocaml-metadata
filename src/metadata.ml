@@ -5,6 +5,7 @@ module Make(E : CharEncoding.T) = struct
   module ID3v1 = MetadataID3v1
   module ID3v2 = MetadataID3v2
   module OGG = MetadataOGG
+  module FLAC = MetadataFLAC
   module JPEG = MetadataJPEG
   module PNG = MetadataPNG
   module AVI = MetadataAVI
@@ -37,7 +38,7 @@ module Make(E : CharEncoding.T) = struct
     | [] -> raise Invalid
 
   module Audio = struct
-    let parsers = [ID3.parse; OGG.parse]
+    let parsers = [ID3.parse; OGG.parse; FLAC.parse]
     let parse = first_valid parsers
     let parse_file = Reader.with_file parse
   end

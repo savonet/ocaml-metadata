@@ -49,6 +49,12 @@ module Reader = struct
   let uint16_le = int16_le
   let int16 = function Big_endian -> int16_be | Little_endian -> int16_le
 
+  let int24_be f =
+    let b0 = byte f in
+    let b1 = byte f in
+    let b2 = byte f in
+    (b0 lsl 16 + b1 lsl 8 + b2)
+
   let int32_le f =
     let b0 = byte f in
     let b1 = byte f in
