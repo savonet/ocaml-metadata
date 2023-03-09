@@ -1,6 +1,6 @@
 module CharEncoding = MetadataCharEncoding
 
-module Make(E : CharEncoding.T) = struct
+module Make (E : CharEncoding.T) = struct
   include MetadataBase
   module ID3v1 = MetadataID3v1
   module ID3v2 = MetadataID3v2
@@ -15,7 +15,9 @@ module Make(E : CharEncoding.T) = struct
 
   module ID3 = struct
     let parse f =
-      let failure, v2 = try (false, ID3v2.parse ~recode f) with _ -> (true, []) in
+      let failure, v2 =
+        try (false, ID3v2.parse ~recode f) with _ -> (true, [])
+      in
       let v1 =
         try
           Reader.reset f;
@@ -30,12 +32,12 @@ module Make(E : CharEncoding.T) = struct
   (** Return the first application which does not raise invalid. *)
   let rec first_valid l file =
     match l with
-    | f :: l -> (
-        try f file
-        with Invalid ->
-          Reader.reset file;
-          first_valid l file)
-    | [] -> raise Invalid
+      | f :: l -> (
+          try f file
+          with Invalid ->
+            Reader.reset file;
+            first_valid l file)
+      | [] -> raise Invalid
 
   module Audio = struct
     let parsers = [ID3.parse; OGG.parse; FLAC.parse]
@@ -64,4 +66,4 @@ module Make(E : CharEncoding.T) = struct
   include Any
 end
 
-include Make(CharEncoding.Naive)
+include Make (CharEncoding.Naive)

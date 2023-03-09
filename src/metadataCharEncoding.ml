@@ -1,5 +1,8 @@
 module type T = sig
-  val convert : ?source:[`ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE] -> string -> string
+  val convert :
+    ?source:[ `ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
+    string ->
+    string
 end
 
 module Naive : T = struct
@@ -8,37 +11,32 @@ module Naive : T = struct
     let endianness = ref `BE in
     let buf = Buffer.create 10 in
     match source with
-    | (`UTF_16 | `UTF_16LE | `UTF_16BE) as source ->
-       let get_char =
-         match source with
-         | `UTF_16LE -> String.get_utf_16le_uchar
-         | `UTF_16BE -> String.get_utf_16be_uchar
-         | `UTF_16 ->
-            match !endianness with
-            | `LE -> String.get_utf_16le_uchar
-            | `BE -> String.get_utf_16be_uchar
-       in
-       let len = String.length s in
-       let rec f pos =
-         if pos = len then
-           Buffer.contents buf
-         else if pos + 2 <= len && s.[pos] = '\xfe' && s.[pos] = '\xff' then
-           (
-             endianness := `BE;
-             f (pos + 2)
-           )
-         else if pos + 2 <= len && s.[pos] = '\xff' && s.[pos] = '\xfe' then
-           (
-             endianness := `LE;
-             f (pos + 2)
-           )
-         else
-           let d = get_char s pos in
-           let c = Uchar.utf_decode_uchar d in
-           Buffer.add_utf_8_uchar buf c;
-           f (pos + Uchar.utf_decode_length d)
-       in
-       f 0
-    | `UTF_8 -> s
-    | _ -> s
+      | (`UTF_16 | `UTF_16LE | `UTF_16BE) as source ->
+          let get_char =
+            match source with
+              | `UTF_16LE -> String.get_utf_16le_uchar
+              | `UTF_16BE -> String.get_utf_16be_uchar
+              | `UTF_16 -> (
+                  match !endianness with
+                    | `LE -> String.get_utf_16le_uchar
+                    | `BE -> String.get_utf_16be_uchar)
+          in
+          let len = String.length s in
+          let rec f pos =
+            if pos = len then Buffer.contents buf
+            else if pos + 2 <= len && s.[pos] = '\xfe' && s.[pos] = '\xff' then (
+              endianness := `BE;
+              f (pos + 2))
+            else if pos + 2 <= len && s.[pos] = '\xff' && s.[pos] = '\xfe' then (
+              endianness := `LE;
+              f (pos + 2))
+            else (
+              let d = get_char s pos in
+              let c = Uchar.utf_decode_uchar d in
+              Buffer.add_utf_8_uchar buf c;
+              f (pos + Uchar.utf_decode_length d))
+          in
+          f 0
+      | `UTF_8 -> s
+      | _ -> s
 end

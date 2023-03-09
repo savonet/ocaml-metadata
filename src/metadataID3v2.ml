@@ -23,37 +23,32 @@ let read_size_v2 f =
 let unterminate encoding s =
   let n = String.length s in
   match encoding with
-  | 0 | 3 -> if String.length s > 0 && s.[n-1] = '\000' then String.sub s 0 (n-1) else s
-  | 1 | 2 -> if String.length s >= 2 && s.[n-1] = '\000' && s.[n-2] = '\000' then String.sub s 0 (n-2) else s
-  | _ -> failwith (Printf.sprintf "Unknown encoding: %d." encoding)
+    | 0 | 3 ->
+        if String.length s > 0 && s.[n - 1] = '\000' then String.sub s 0 (n - 1)
+        else s
+    | 1 | 2 ->
+        if String.length s >= 2 && s.[n - 1] = '\000' && s.[n - 2] = '\000' then
+          String.sub s 0 (n - 2)
+        else s
+    | _ -> failwith (Printf.sprintf "Unknown encoding: %d." encoding)
 
 (** Find the index of the substring after the first null-terminated
     substring. *)
-let next_substring encoding ?(offset=0) s =
+let next_substring encoding ?(offset = 0) s =
   let ans = ref 0 in
   let utf16 = encoding = 1 || encoding = 2 in
   try
-    for i = offset to String.length s - (if utf16 then 2 else 1) do
-      if utf16 then
-        (
-          if s.[i] = '\000' && s.[i+1] = '\000' then
-            (
-              ans := i + 2;
-              raise Exit
-            )
-        )
-      else
-        (
-          if s.[i] = '\000' then
-            (
-              ans := i + 1;
-              raise Exit
-            )
-        )
+    for i = offset to String.length s - if utf16 then 2 else 1 do
+      if utf16 then (
+        if s.[i] = '\000' && s.[i + 1] = '\000' then (
+          ans := i + 2;
+          raise Exit))
+      else if s.[i] = '\000' then (
+        ans := i + 1;
+        raise Exit)
     done;
     raise Not_found
-  with
-  | Exit -> !ans
+  with Exit -> !ans
 
 let normalize_id = function
   | "COMM" -> "comment"
@@ -78,20 +73,24 @@ let normalize_id = function
   | id -> id
 
 let make_recode recode =
-  let recode = Option.value ~default:MetadataCharEncoding.Naive.convert recode in
+  let recode =
+    Option.value ~default:MetadataCharEncoding.Naive.convert recode
+  in
   let recode : int -> string -> string = function
     | 0 -> recode ~source:`ISO_8859_1
     | 1 -> (
         fun s ->
           match String.length s with
-          (* Probably invalid string *)
-          | n when n < 2 -> s
-          | n -> (
-              match String.sub s 0 2 with
-              | "\255\254" | "\255\246" -> recode ~source:`UTF_16LE (String.sub s 2 (n - 2))
-              | "\254\255" | "\246\255" -> recode ~source:`UTF_16BE (String.sub s 2 (n - 2))
-              (* Probably invalid string *)
-              | _ -> recode ~source:`UTF_16 s))
+            (* Probably invalid string *)
+            | n when n < 2 -> s
+            | n -> (
+                match String.sub s 0 2 with
+                  | "\255\254" | "\255\246" ->
+                      recode ~source:`UTF_16LE (String.sub s 2 (n - 2))
+                  | "\254\255" | "\246\255" ->
+                      recode ~source:`UTF_16BE (String.sub s 2 (n - 2))
+                  (* Probably invalid string *)
+                  | _ -> recode ~source:`UTF_16 s))
     | 2 -> recode ~source:`UTF_16
     | 3 -> recode ~source:`UTF_8
     (* Invalid encoding. *)
@@ -132,8 +131,8 @@ let parse ?recode f : metadata =
       let id_len = min !len id_len in
       let id = R.read f (min !len id_len) in
       if id = "\000\000\000\000" || id = "\000\000\000" then len := 0
-      (* stop tag *)
-      else
+        (* stop tag *)
+      else (
         let size = read_frame_size f in
         (* make sure that we remain within the bounds in case of a problem *)
         let size = min size (!len - 10) in
@@ -142,44 +141,42 @@ let parse ?recode f : metadata =
         len := !len - (size + 10);
         let compressed =
           match flags with
-          | None -> false
-          | Some flags -> int_of_char flags.[1] land 0b10000000 <> 0
+            | None -> false
+            | Some flags -> int_of_char flags.[1] land 0b10000000 <> 0
         in
         let encrypted =
           match flags with
-          | None -> false
-          | Some flags -> int_of_char flags.[1] land 0b01000000 <> 0
+            | None -> false
+            | Some flags -> int_of_char flags.[1] land 0b01000000 <> 0
         in
         if compressed || encrypted then raise Exit;
         let len = String.length data in
         if List.mem id ["SEEK"] then ()
-        else if id = "TXXX" then
+        else if id = "TXXX" then (
           let encoding = int_of_char data.[0] in
           let data = String.sub data 1 (len - 1) in
           let recode = recode encoding in
           let id, data =
             let n = next_substring encoding data in
-            String.sub data 0 n,
-            String.sub data n (String.length data - n)
+            (String.sub data 0 n, String.sub data n (String.length data - n))
           in
           let id = recode id in
           let data = recode data in
-          tags := (id, data) :: !tags
-        else if id = "COMM" then
+          tags := (id, data) :: !tags)
+        else if id = "COMM" then (
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) in
           (* We ignore the language description of the comment. *)
           let n = try next_substring encoding data with Not_found -> 0 in
           let data = String.sub data n (String.length data - n) |> recode in
-          tags := ("comment", data) :: !tags
-        else if id.[0] = 'T' || id = "COMM" then
+          tags := ("comment", data) :: !tags)
+        else if id.[0] = 'T' || id = "COMM" then (
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in
-          tags := (normalize_id id, data) :: !tags
-        else
-          tags := (normalize_id id, data) :: !tags
+          tags := (normalize_id id, data) :: !tags)
+        else tags := (normalize_id id, data) :: !tags)
     with Exit -> ()
   done;
   List.rev !tags

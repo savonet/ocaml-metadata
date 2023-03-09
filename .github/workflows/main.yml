@@ -14,5 +14,7 @@ jobs:
       run: opam pin add -n .
     - name: Install dependencies
       run: opam depext -yt metadata
-    - name: Build, test and install
+    - name: Build and install
       run: opam install -t .
+    - name: Run tests
+      run: dune build @citest
