@@ -53,7 +53,7 @@ module Reader = struct
     let b0 = byte f in
     let b1 = byte f in
     let b2 = byte f in
-    (b0 lsl 16 + b1 lsl 8 + b2)
+    (b0 lsl 16) + (b1 lsl 8) + b2
 
   let int32_le f =
     let b0 = byte f in
@@ -77,7 +77,7 @@ module Reader = struct
   let reset f = f.reset ()
 
   let with_file f fname =
-    let fd = Unix.openfile fname [] 0o644 in
+    let fd = Unix.openfile fname [Unix.O_RDONLY; Unix.O_CLOEXEC] 0o644 in
     let file =
       let read = Unix.read fd in
       let seek n = ignore (Unix.lseek fd n Unix.SEEK_CUR) in

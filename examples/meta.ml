@@ -50,7 +50,12 @@ let () =
       List.iter
         (fun (k, v) ->
           let v =
-            if k = "APIC" || k = "PIC" || k = "metadata_block_picture" || k = "RVA2" then "<redacted>" else v
+            if
+              k = "APIC" || k = "PIC"
+              || k = "metadata_block_picture"
+              || k = "RVA2"
+            then "<redacted>"
+            else v
           in
           Printf.printf "- %s: %s\n%!" k v;
           if !binary then Printf.printf "  %s: %S\n%!" k v)
