@@ -8,26 +8,22 @@ end
 module Naive : T = struct
   let convert ?source s =
     let source = match source with None -> `UTF_8 | Some x -> x in
-    let endianness = ref `BE in
+    let endianness = ref (if source = `UTF_16LE then `LE else `BE) in
     let buf = Buffer.create 10 in
     match source with
-      | (`UTF_16 | `UTF_16LE | `UTF_16BE) as source ->
-          let get_char =
-            match source with
-              | `UTF_16LE -> String.get_utf_16le_uchar
-              | `UTF_16BE -> String.get_utf_16be_uchar
-              | `UTF_16 -> (
-                  match !endianness with
-                    | `LE -> String.get_utf_16le_uchar
-                    | `BE -> String.get_utf_16be_uchar)
-          in
+      | `UTF_16 | `UTF_16LE | `UTF_16BE ->
           let len = String.length s in
           let rec f pos =
+            let get_char =
+              match !endianness with
+              | `LE -> String.get_utf_16le_uchar
+              | `BE -> String.get_utf_16be_uchar
+            in
             if pos = len then Buffer.contents buf
-            else if pos + 2 <= len && s.[pos] = '\xfe' && s.[pos] = '\xff' then (
+            else if pos + 2 <= len && s.[pos] = '\xfe' && s.[pos+1] = '\xff' then (
               endianness := `BE;
               f (pos + 2))
-            else if pos + 2 <= len && s.[pos] = '\xff' && s.[pos] = '\xfe' then (
+            else if pos + 2 <= len && s.[pos] = '\xff' && s.[pos+1] = '\xfe' then (
               endianness := `LE;
               f (pos + 2))
             else (

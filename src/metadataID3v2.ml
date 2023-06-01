@@ -38,15 +38,20 @@ let next_substring encoding ?(offset = 0) s =
   let ans = ref 0 in
   let utf16 = encoding = 1 || encoding = 2 in
   try
-    for i = offset to String.length s - if utf16 then 2 else 1 do
-      if utf16 then (
-        if s.[i] = '\000' && s.[i + 1] = '\000' then (
-          ans := i + 2;
-          raise Exit))
-      else if s.[i] = '\000' then (
-        ans := i + 1;
-        raise Exit)
-    done;
+    if utf16 then
+      for i = offset to String.length s / 2 - 1 do
+        if s.[2*i] = '\000' && s.[2*i+1] = '\000' then (
+          ans := 2*i+2;
+          raise Exit
+        )
+      done
+    else
+      for i = offset to String.length s - 1 do
+        if s.[i] = '\000' then (
+          ans := i + 1;
+          raise Exit
+        )
+      done;
     raise Not_found
   with Exit -> !ans
 
@@ -78,19 +83,7 @@ let make_recode recode =
   in
   let recode : int -> string -> string = function
     | 0 -> recode ~source:`ISO_8859_1
-    | 1 -> (
-        fun s ->
-          match String.length s with
-            (* Probably invalid string *)
-            | n when n < 2 -> s
-            | n -> (
-                match String.sub s 0 2 with
-                  | "\255\254" | "\255\246" ->
-                      recode ~source:`UTF_16LE (String.sub s 2 (n - 2))
-                  | "\254\255" | "\246\255" ->
-                      recode ~source:`UTF_16BE (String.sub s 2 (n - 2))
-                  (* Probably invalid string *)
-                  | _ -> recode ~source:`UTF_16 s))
+    | 1 -> recode ~source:`UTF_16
     | 2 -> recode ~source:`UTF_16
     | 3 -> recode ~source:`UTF_8
     (* Invalid encoding. *)
