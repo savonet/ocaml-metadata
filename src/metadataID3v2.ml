@@ -175,7 +175,14 @@ let parse ?recode f : metadata =
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in
-          tags := (normalize_id id, data) :: !tags)
+          if id = "TLEN" then
+            (
+              match int_of_string_opt data with
+              | Some n -> tags := ("duration", string_of_float (float n /. 1000.)) :: !tags
+              | None -> ()
+            )
+          else
+            tags := (normalize_id id, data) :: !tags)
         else tags := (normalize_id id, data) :: !tags)
     with Exit -> ()
   done;
