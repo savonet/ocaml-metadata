@@ -53,7 +53,7 @@ let next_substring encoding ?(offset = 0) s =
 let normalize_id = function
   | "COMM" -> "comment"
   | "TALB" -> "album"
-  | "TBPM" -> "tempo"
+  | "TBPM" -> "bpm"
   | "TCOM" -> "composer"
   | "TCON" -> "content"
   | "TCOP" -> "copyright"
