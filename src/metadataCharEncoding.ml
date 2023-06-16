@@ -1,38 +1,58 @@
 module type T = sig
   val convert :
     ?source:[ `ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
+    ?destination:[ `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
     string ->
     string
 end
 
 module Naive : T = struct
-  let convert ?source s =
-    let source = match source with None -> `UTF_8 | Some x -> x in
-    let endianness = ref (if source = `UTF_16LE then `LE else `BE) in
-    let buf = Buffer.create 10 in
-    match source with
-      | `UTF_16 | `UTF_16LE | `UTF_16BE ->
+  let convert ?(source = `UTF_8) ?(destination = `UTF_8) s =
+    match (source, destination) with
+      | `UTF_8, `UTF_8
+      | `UTF_16, `UTF_16
+      | `UTF_16LE, `UTF_16LE
+      | `UTF_16BE, `UTF_16BE
+      | `ISO_8859_1, _ ->
+          s
+      | _ ->
+          let buf = Buffer.create 10 in
+          let len = String.length s in
+          let add_unicode_char =
+            match destination with
+              | `UTF_8 -> Buffer.add_utf_8_uchar
+              | `UTF_16BE -> Buffer.add_utf_16be_uchar
+              | _ -> Buffer.add_utf_16le_uchar
+          in
+          let unicode_byte_length =
+            match source with
+              | `ISO_8859_1 -> assert false
+              | `UTF_8 -> Uchar.utf_8_byte_length
+              | _ -> Uchar.utf_16_byte_length
+          in
+          let s, get_unicode_char =
+            match source with
+              | `ISO_8859_1 -> assert false
+              | `UTF_8 -> (s, String.get_utf_8_uchar)
+              | `UTF_16BE -> (s, String.get_utf_16be_uchar)
+              | `UTF_16LE -> (s, String.get_utf_16le_uchar)
+              | `UTF_16 ->
+                  if len < 2 then ("", String.get_utf_16be_uchar)
+                  else (
+                    let rem = String.sub s 2 (len - 2) in
+                    match (s.[0], s.[1]) with
+                      | '\xfe', '\xff' -> (rem, String.get_utf_16be_uchar)
+                      | '\xff', '\xfe' -> (rem, String.get_utf_16le_uchar)
+                      | _ -> raise MetadataBase.Invalid)
+          in
+          if destination = `UTF_16 then add_unicode_char buf Uchar.bom;
           let len = String.length s in
           let rec f pos =
-            let get_char =
-              match !endianness with
-              | `LE -> String.get_utf_16le_uchar
-              | `BE -> String.get_utf_16be_uchar
-            in
             if pos = len then Buffer.contents buf
-            else if pos + 2 <= len && s.[pos] = '\xfe' && s.[pos+1] = '\xff' then (
-              endianness := `BE;
-              f (pos + 2))
-            else if pos + 2 <= len && s.[pos] = '\xff' && s.[pos+1] = '\xfe' then (
-              endianness := `LE;
-              f (pos + 2))
             else (
-              let d = get_char s pos in
-              let c = Uchar.utf_decode_uchar d in
-              Buffer.add_utf_8_uchar buf c;
-              f (pos + Uchar.utf_decode_length d))
+              let c = Uchar.utf_decode_uchar (get_unicode_char s pos) in
+              add_unicode_char buf c;
+              f (pos + unicode_byte_length c))
           in
           f 0
-      | `UTF_8 -> s
-      | _ -> s
 end

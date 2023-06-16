@@ -39,18 +39,16 @@ let next_substring encoding ?(offset = 0) s =
   let utf16 = encoding = 1 || encoding = 2 in
   try
     if utf16 then
-      for i = offset to String.length s / 2 - 1 do
-        if s.[2*i] = '\000' && s.[2*i+1] = '\000' then (
-          ans := 2*i+2;
-          raise Exit
-        )
+      for i = offset to (String.length s / 2) - 1 do
+        if s.[2 * i] = '\000' && s.[(2 * i) + 1] = '\000' then (
+          ans := (2 * i) + 2;
+          raise Exit)
       done
     else
       for i = offset to String.length s - 1 do
         if s.[i] = '\000' then (
           ans := i + 1;
-          raise Exit
-        )
+          raise Exit)
       done;
     raise Not_found
   with Exit -> !ans
@@ -82,10 +80,10 @@ let make_recode recode =
     Option.value ~default:MetadataCharEncoding.Naive.convert recode
   in
   let recode : int -> string -> string = function
-    | 0 -> recode ~source:`ISO_8859_1
-    | 1 -> recode ~source:`UTF_16
-    | 2 -> recode ~source:`UTF_16
-    | 3 -> recode ~source:`UTF_8
+    | 0 -> recode ~source:`ISO_8859_1 ~destination:`UTF_8
+    | 1 -> recode ~source:`UTF_16 ~destination:`UTF_8
+    | 2 -> recode ~source:`UTF_16 ~destination:`UTF_8
+    | 3 -> recode ~source:`UTF_8 ~destination:`UTF_8
     (* Invalid encoding. *)
     | _ -> fun s -> s
   in
@@ -168,14 +166,13 @@ let parse ?recode f : metadata =
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in
-          if id = "TLEN" then
-            (
-              match int_of_string_opt data with
-              | Some n -> tags := ("duration", string_of_float (float n /. 1000.)) :: !tags
-              | None -> ()
-            )
-          else
-            tags := (normalize_id id, data) :: !tags)
+          if id = "TLEN" then (
+            match int_of_string_opt data with
+              | Some n ->
+                  tags :=
+                    ("duration", string_of_float (float n /. 1000.)) :: !tags
+              | None -> ())
+          else tags := (normalize_id id, data) :: !tags)
         else tags := (normalize_id id, data) :: !tags)
     with Exit -> ()
   done;
@@ -251,3 +248,239 @@ let parse_pic ?recode pic =
   let n = 5 + l + text_bytes in
   let pic_data = String.sub pic n (String.length pic - n) in
   { pic_format; pic_type; pic_description; pic_data }
+
+type frame_id =
+  [ `AENC
+  | `APIC
+  | `COMM
+  | `COMR
+  | `ENCR
+  | `EQUA
+  | `ETCO
+  | `GEOB
+  | `GRID
+  | `IPLS
+  | `LINK
+  | `MCDI
+  | `MLLT
+  | `OWNE
+  | `PCNT
+  | `POPM
+  | `POSS
+  | `PRIV
+  | `RBUF
+  | `RVAD
+  | `RVRB
+  | `SYLT
+  | `SYTC
+  | `TALB
+  | `TBPM
+  | `TCOM
+  | `TCON
+  | `TCOP
+  | `TDAT
+  | `TDLY
+  | `TENC
+  | `TEXT
+  | `TFLT
+  | `TIME
+  | `TIT1
+  | `TIT2
+  | `TIT3
+  | `TKEY
+  | `TLAN
+  | `TLEN
+  | `TMED
+  | `TOAL
+  | `TOFN
+  | `TOLY
+  | `TOPE
+  | `TORY
+  | `TOWN
+  | `TPE1
+  | `TPE2
+  | `TPE3
+  | `TPE4
+  | `TPOS
+  | `TPUB
+  | `TRCK
+  | `TRDA
+  | `TRSN
+  | `TRSO
+  | `TSIZ
+  | `TSRC
+  | `TSSE
+  | `TXXX
+  | `TYER
+  | `UFID
+  | `USER
+  | `USLT
+  | `WCOM
+  | `WCOP
+  | `WOAF
+  | `WOAR
+  | `WOAS
+  | `WORS
+  | `WPAY
+  | `WPUB
+  | `WXXX ]
+
+let string_of_frame_id = function
+  | `AENC -> "AENC"
+  | `APIC -> "APIC"
+  | `COMM -> "COMM"
+  | `COMR -> "COMR"
+  | `ENCR -> "ENCR"
+  | `EQUA -> "EQUA"
+  | `ETCO -> "ETCO"
+  | `GEOB -> "GEOB"
+  | `GRID -> "GRID"
+  | `IPLS -> "IPLS"
+  | `LINK -> "LINK"
+  | `MCDI -> "MCDI"
+  | `MLLT -> "MLLT"
+  | `OWNE -> "OWNE"
+  | `PCNT -> "PCNT"
+  | `POPM -> "POPM"
+  | `POSS -> "POSS"
+  | `PRIV -> "PRIV"
+  | `RBUF -> "RBUF"
+  | `RVAD -> "RVAD"
+  | `RVRB -> "RVRB"
+  | `SYLT -> "SYLT"
+  | `SYTC -> "SYTC"
+  | `TALB -> "TALB"
+  | `TBPM -> "TBPM"
+  | `TCOM -> "TCOM"
+  | `TCON -> "TCON"
+  | `TCOP -> "TCOP"
+  | `TDAT -> "TDAT"
+  | `TDLY -> "TDLY"
+  | `TENC -> "TENC"
+  | `TEXT -> "TEXT"
+  | `TFLT -> "TFLT"
+  | `TIME -> "TIME"
+  | `TIT1 -> "TIT1"
+  | `TIT2 -> "TIT2"
+  | `TIT3 -> "TIT3"
+  | `TKEY -> "TKEY"
+  | `TLAN -> "TLAN"
+  | `TLEN -> "TLEN"
+  | `TMED -> "TMED"
+  | `TOAL -> "TOAL"
+  | `TOFN -> "TOFN"
+  | `TOLY -> "TOLY"
+  | `TOPE -> "TOPE"
+  | `TORY -> "TORY"
+  | `TOWN -> "TOWN"
+  | `TPE1 -> "TPE1"
+  | `TPE2 -> "TPE2"
+  | `TPE3 -> "TPE3"
+  | `TPE4 -> "TPE4"
+  | `TPOS -> "TPOS"
+  | `TPUB -> "TPUB"
+  | `TRCK -> "TRCK"
+  | `TRDA -> "TRDA"
+  | `TRSN -> "TRSN"
+  | `TRSO -> "TRSO"
+  | `TSIZ -> "TSIZ"
+  | `TSRC -> "TSRC"
+  | `TSSE -> "TSSE"
+  | `TXXX -> "TXXX"
+  | `TYER -> "TYER"
+  | `UFID -> "UFID"
+  | `USER -> "USER"
+  | `USLT -> "USLT"
+  | `WCOM -> "WCOM"
+  | `WCOP -> "WCOP"
+  | `WOAF -> "WOAF"
+  | `WOAR -> "WOAR"
+  | `WOAS -> "WOAS"
+  | `WORS -> "WORS"
+  | `WPAY -> "WPAY"
+  | `WPUB -> "WPUB"
+  | `WXXX -> "WXXX"
+
+type frame_flag =
+  [ `Tag_alter_perservation of bool | `File_alter_preservation of bool ]
+
+let default_flags = function
+  | `AENC | `ETCO | `EQUA | `MLLT | `POSS | `SYLT | `SYTC | `RVAD | `TENC
+  | `TLEN | `TSIZ ->
+      [`Tag_alter_perservation true; `File_alter_preservation false]
+  | _ -> [`Tag_alter_perservation true; `File_alter_preservation true]
+
+type text_encoding = [ `ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ]
+type frame_data = [ `Text of text_encoding * string ]
+type frame = { id : frame_id; data : frame_data; flags : frame_flag list }
+
+let write_string ~buf = Buffer.add_string buf
+
+let write_int32 ~buf n =
+  Buffer.add_char buf (char_of_int ((n land 0xff000000) lsr 24));
+  Buffer.add_char buf (char_of_int ((n land 0xff0000) lsr 16));
+  Buffer.add_char buf (char_of_int ((n land 0xff00) lsr 8));
+  Buffer.add_char buf (char_of_int (n land 0xff))
+
+let write_int16 ~buf n =
+  Buffer.add_char buf (char_of_int ((n land 0xff00) lsr 8));
+  Buffer.add_char buf (char_of_int (n land 0xff))
+
+let write_int ~buf n = Buffer.add_char buf (char_of_int n)
+
+let write_size ~buf n =
+  if 0x0fffffff < n then raise Invalid;
+  for i = 0 to 3 do
+    let n = n lsr (7 * (3 - i)) in
+    Buffer.add_char buf (char_of_int (n land 0x7f))
+  done
+
+let render_frame_data ~version = function
+  | `Text (encoding, data) ->
+      let encoding, data =
+        match encoding with
+          | `ISO_8859_1 -> (0, data)
+          | `UTF_16 -> (1, data)
+          | `UTF_16BE when version >= 3 -> (2, data)
+          | `UTF_8 when version >= 3 -> (3, data)
+          | source ->
+              ( 1,
+                MetadataCharEncoding.Naive.convert ~source ~destination:`UTF_16
+                  data )
+      in
+      Printf.sprintf "%c%s" (Char.chr encoding) data
+
+let render_frames ~version frames =
+  let buf = Buffer.create 1024 in
+  List.iter
+    (fun { id; data; flags } ->
+      write_string ~buf (string_of_frame_id id);
+      let data = render_frame_data ~version data in
+      let frame_length = String.length data in
+      if version < 4 then write_int32 ~buf frame_length
+      else write_size ~buf frame_length;
+      write_int16 ~buf
+        (List.fold_left
+           (fun flags flag ->
+             flags
+             lor
+             match flag with
+               | `Tag_alter_perservation true -> 0b10000000 lsl 8
+               | `File_alter_preservation true -> 0b01000000 lsl 8
+               | _ -> 0)
+           0 flags);
+      write_string ~buf data)
+    frames;
+  buf
+
+let make ~version frames =
+  let buf = Buffer.create 1024 in
+  write_string ~buf "ID3";
+  write_int ~buf version;
+  write_int ~buf 0;
+  let tags = 0 in
+  write_int ~buf tags;
+  let frame_content = render_frames ~version frames in
+  write_size ~buf (Buffer.length frame_content);
+  Buffer.add_buffer buf frame_content;
+  Buffer.contents buf
