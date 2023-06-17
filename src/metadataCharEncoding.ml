@@ -37,13 +37,14 @@ module Naive : T = struct
               | `UTF_16BE -> (s, String.get_utf_16be_uchar)
               | `UTF_16LE -> (s, String.get_utf_16le_uchar)
               | `UTF_16 ->
-                  if len < 2 then ("", String.get_utf_16be_uchar)
+                  let default = ("", String.get_utf_16be_uchar) in
+                  if len < 2 then default
                   else (
                     let rem = String.sub s 2 (len - 2) in
                     match (s.[0], s.[1]) with
                       | '\xfe', '\xff' -> (rem, String.get_utf_16be_uchar)
                       | '\xff', '\xfe' -> (rem, String.get_utf_16le_uchar)
-                      | _ -> raise MetadataBase.Invalid)
+                      | _ -> default)
           in
           if destination = `UTF_16 then add_unicode_char buf Uchar.bom;
           let len = String.length s in
