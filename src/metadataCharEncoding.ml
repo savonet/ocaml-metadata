@@ -1,14 +1,14 @@
 module type T = sig
   val convert :
     ?source:[ `ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
-    ?destination:[ `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
+    ?target:[ `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
     string ->
     string
 end
 
 module Naive : T = struct
-  let convert ?(source = `UTF_8) ?(destination = `UTF_8) s =
-    match (source, destination) with
+  let convert ?(source = `UTF_8) ?(target = `UTF_8) s =
+    match (source, target) with
       | `UTF_8, `UTF_8
       | `UTF_16, `UTF_16
       | `UTF_16LE, `UTF_16LE
@@ -19,7 +19,7 @@ module Naive : T = struct
           let buf = Buffer.create 10 in
           let len = String.length s in
           let add_unicode_char =
-            match destination with
+            match target with
               | `UTF_8 -> Buffer.add_utf_8_uchar
               | `UTF_16BE -> Buffer.add_utf_16be_uchar
               | _ -> Buffer.add_utf_16le_uchar
@@ -46,7 +46,7 @@ module Naive : T = struct
                       | '\xff', '\xfe' -> (rem, String.get_utf_16le_uchar)
                       | _ -> default)
           in
-          if destination = `UTF_16 then add_unicode_char buf Uchar.bom;
+          if target = `UTF_16 then add_unicode_char buf Uchar.bom;
           let len = String.length s in
           let rec f pos =
             if pos = len then Buffer.contents buf

@@ -80,10 +80,10 @@ let make_recode recode =
     Option.value ~default:MetadataCharEncoding.Naive.convert recode
   in
   let recode : int -> string -> string = function
-    | 0 -> recode ~source:`ISO_8859_1 ~destination:`UTF_8
-    | 1 -> recode ~source:`UTF_16 ~destination:`UTF_8
-    | 2 -> recode ~source:`UTF_16 ~destination:`UTF_8
-    | 3 -> recode ~source:`UTF_8 ~destination:`UTF_8
+    | 0 -> recode ~source:`ISO_8859_1 ~target:`UTF_8
+    | 1 -> recode ~source:`UTF_16 ~target:`UTF_8
+    | 2 -> recode ~source:`UTF_16 ~target:`UTF_8
+    | 3 -> recode ~source:`UTF_8 ~target:`UTF_8
     (* Invalid encoding. *)
     | _ -> fun s -> s
   in
@@ -445,8 +445,8 @@ let render_frame_data ~version = function
           | `UTF_8 when version >= 3 -> (3, data)
           | source ->
               ( 1,
-                MetadataCharEncoding.Naive.convert ~source ~destination:`UTF_16
-                  data )
+                MetadataCharEncoding.Naive.convert ~source ~target:`UTF_16 data
+              )
       in
       Printf.sprintf "%c%s" (Char.chr encoding) data
 
