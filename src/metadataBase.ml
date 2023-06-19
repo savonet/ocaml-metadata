@@ -100,6 +100,20 @@ module Reader = struct
       let bt = Printexc.get_raw_backtrace () in
       Unix.close fd;
       Printexc.raise_with_backtrace e bt
+
+  let with_string f s =
+    let len = String.length s in
+    let pos = ref 0 in
+    let read b ofs n =
+      let n = min (len - !pos) n in
+      String.blit s !pos b ofs n;
+      pos := !pos + n;
+      n
+    in
+    let seek n = pos := !pos + n in
+    let reset () = pos := 0 in
+    let size () = Some len in
+    f { read; seek; size; reset }
 end
 
 module Int = struct

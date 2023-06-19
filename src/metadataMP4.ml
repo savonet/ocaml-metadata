@@ -37,10 +37,19 @@ let parse f : metadata =
             remaining := !remaining - chunk (tag :: l)
           done
       | ["data"; tag; "ilst"; "meta"; "udta"; "moov"] -> (
-          let value = R.read f (len - 8) in
-          match List.assoc_opt tag tagn with
-            | Some tag -> ans := (tag, value) :: !ans
-            | None -> ())
+          if len < 16 then raise Invalid;
+          let data_type = R.int32_be f in
+          let _ = R.read f 4 in
+          let value = R.read f (len - 16) in
+          match (data_type, List.assoc_opt tag tagn) with
+            | 1, Some tag -> ans := (tag, value) :: !ans
+            | 2, Some tag ->
+                ans :=
+                  ( tag,
+                    MetadataCharEncoding.Naive.convert ~source:`UTF_16BE value
+                  )
+                  :: !ans
+            | _ -> ())
       | _ -> R.drop f (len - 8));
     len
   in
