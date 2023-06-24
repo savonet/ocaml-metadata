@@ -418,17 +418,8 @@ type frame_data = [ `Text of text_encoding * string ]
 type frame = { id : frame_id; data : frame_data; flags : frame_flag list }
 
 let write_string ~buf = Buffer.add_string buf
-
-let write_int32 ~buf n =
-  Buffer.add_char buf (char_of_int ((n lsr 24) land 0xff));
-  Buffer.add_char buf (char_of_int ((n lsr 16) land  0xff));
-  Buffer.add_char buf (char_of_int ((n lsr 8) land 0xff));
-  Buffer.add_char buf (char_of_int (n land 0xff))
-
-let write_int16 ~buf n =
-  Buffer.add_char buf (char_of_int ((n land 0xff00) lsr 8));
-  Buffer.add_char buf (char_of_int (n land 0xff))
-
+let write_int32 ~buf n = Buffer.add_int32_be buf (Int32.of_int n)
+let write_int16 ~buf n = Buffer.add_int16_be buf n
 let write_int ~buf n = Buffer.add_char buf (char_of_int n)
 
 let write_size ~buf n =
