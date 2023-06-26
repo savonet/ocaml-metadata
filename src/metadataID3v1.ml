@@ -9,10 +9,10 @@ let parse ?(recode = MetadataCharEncoding.Naive.convert) f : metadata =
   let size = match R.size f with Some n -> n | None -> raise Invalid in
   R.drop f (size - 128);
   if R.read f 3 <> "TAG" then raise Invalid;
-  let title = R.read f 30 |> trim |> recode in
-  let artist = R.read f 30 |> trim |> recode in
-  let album = R.read f 30 |> trim |> recode in
-  let year = R.read f 4 |> trim |> recode in
+  let title = R.read f 30 |> trim |> recode ~source:`ISO_8859_1 in
+  let artist = R.read f 30 |> trim |> recode ~source:`ISO_8859_1 in
+  let album = R.read f 30 |> trim |> recode ~source:`ISO_8859_1 in
+  let year = R.read f 4 |> trim |> recode ~source:`ISO_8859_1 in
   let comment = R.read f 30 in
   let comment, track, genre =
     if comment.[27] = '\000' then
