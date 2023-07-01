@@ -1,4 +1,4 @@
-0.2.0 (unreleased)
+0.2.0 (2023-07-01)
 =====
 - Add support for FLAC.
 - id3v2: use "bpm" instead of "tempo".
