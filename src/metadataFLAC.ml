@@ -1,5 +1,5 @@
 open MetadataBase
-module R = Reader
+module R = MetadataBase.Reader
 
 let parse f : metadata =
   let id = R.read f 4 in

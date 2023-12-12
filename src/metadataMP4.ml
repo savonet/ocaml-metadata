@@ -1,5 +1,5 @@
 open MetadataBase
-module R = Reader
+module R = MetadataBase.Reader
 
 let tagn =
   [

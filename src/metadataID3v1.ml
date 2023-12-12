@@ -1,5 +1,5 @@
 open MetadataBase
-module R = Reader
+module R = MetadataBase.Reader
 
 let trim s =
   match String.index_opt s '\000' with Some n -> String.sub s 0 n | None -> s

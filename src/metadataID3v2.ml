@@ -1,5 +1,5 @@
 open MetadataBase
-module R = Reader
+module R = MetadataBase.Reader
 
 let read_size ~synch_safe f =
   let s = R.read f 4 in

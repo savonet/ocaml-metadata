@@ -1,5 +1,5 @@
 open MetadataBase
-module R = Reader
+module R = MetadataBase.Reader
 
 let parse f : metadata =
   if R.read f 8 <> "\x89PNG\x0d\x0a\x1a\x0a" then raise Invalid;
