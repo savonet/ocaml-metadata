@@ -1,7 +1,11 @@
 (** Raised when the format is invalid. *)
 exception Invalid
 
-type metadata = (string * string) list
+type bigarray =
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+type value = [ `String of string | `Bigarray of bigarray ]
+type metadata = (string * value) list
 type endianness = Big_endian | Little_endian
 
 module Reader = struct

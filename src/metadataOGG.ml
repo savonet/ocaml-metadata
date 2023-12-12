@@ -66,11 +66,12 @@ let parse f : metadata =
             | Some n ->
                 Some
                   ( String.sub c 0 n,
-                    String.sub c (n + 1) (String.length c - (n + 1)) )
+                    `String (String.sub c (n + 1) (String.length c - (n + 1)))
+                  )
             | None -> None)
         comments
     in
-    ("vendor", vendor) :: comments
+    ("vendor", `String vendor) :: comments
   in
   if peek 8 = "OpusHead" then (
     R.drop f 8;

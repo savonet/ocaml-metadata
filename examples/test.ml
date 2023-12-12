@@ -1,6 +1,13 @@
 let p name m =
+  let string_of_value = function
+    | `String s -> s
+    | `Bigarray ba ->
+        String.init (Bigarray.Array1.dim ba) (fun i ->
+            Bigarray.Array1.unsafe_get ba i)
+  in
   let m =
-    List.map (fun (l, v) -> "- " ^ l ^ " : " ^ v) m |> String.concat "\n"
+    List.map (fun (l, v) -> "- " ^ l ^ " : " ^ string_of_value v) m
+    |> String.concat "\n"
   in
   Printf.printf "# Testing %s\n\n%s\n\n%!" name m
 

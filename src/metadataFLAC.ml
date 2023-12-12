@@ -40,7 +40,7 @@ let parse f : metadata =
     if not last then block ()
   in
   block ();
-  List.rev !tags
+  List.rev_map (fun (k, v) -> (k, `String v)) !tags
 
 let parse_file = R.with_file parse
 

@@ -40,6 +40,6 @@ let parse f : metadata =
           read_maker ()
   in
   read_maker ();
-  List.rev !metadata
+  List.rev_map (fun (k, v) -> (k, `String v)) !metadata
 
 let parse_file = R.with_file parse

@@ -39,7 +39,7 @@ let () =
       Metadata.Reader.with_string
         (fun reader ->
           let tags = Metadata.ID3v2.parse reader in
-          assert (List.assoc "title" tags = {|foobar😅|});
-          assert (List.assoc "album" tags = {|Let's go get them ⚡️|}))
+          assert (List.assoc "title" tags = `String {|foobar😅|});
+          assert (List.assoc "album" tags = `String {|Let's go get them ⚡️|}))
         tag)
     [3; 4]

@@ -10,9 +10,9 @@ let parse f : metadata =
   let bit_depth = R.byte f in
   let _ (* color_type *) = R.byte f in
   [
-    ("width", string_of_int width);
-    ("height", string_of_int height);
-    ("bit_depth", string_of_int bit_depth);
+    ("width", `String (string_of_int width));
+    ("height", `String (string_of_int height));
+    ("bit_depth", `String (string_of_int bit_depth));
   ]
 
 let parse_file = R.with_file parse

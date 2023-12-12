@@ -55,7 +55,7 @@ let () =
               || k = "metadata_block_picture"
               || k = "RVA2"
             then "<redacted>"
-            else v
+            else (match v with `String s -> s | `Bigarray _ -> "<bigarray>")
           in
           Printf.printf "- %s: %s\n%!" k v;
           if !binary then Printf.printf "  %s: %S\n%!" k v)

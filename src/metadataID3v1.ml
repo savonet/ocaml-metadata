@@ -24,14 +24,14 @@ let parse ?(recode = MetadataCharEncoding.Naive.convert) f : metadata =
   let genre = if genre = 255 then "" else string_of_int genre in
   let genre = recode genre in
   [
-    ("title", title);
-    ("artist", artist);
-    ("album", album);
-    ("year", year);
-    ("comment", comment);
-    ("track", track);
-    ("genre", genre);
+    ("title", `String title);
+    ("artist", `String artist);
+    ("album", `String album);
+    ("year", `String year);
+    ("comment", `String comment);
+    ("track", `String track);
+    ("genre", `String genre);
   ]
-  |> List.filter (fun (_, v) -> v <> "")
+  |> List.filter (fun (_, v) -> v <> `String "")
 
 let parse_file = R.with_file parse
