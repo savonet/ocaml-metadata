@@ -1,6 +1,7 @@
 let p name m =
   let string_of_value = function
     | `String s -> s
+    | `Float f -> string_of_float f
     | `Bigarray ba ->
         String.init (Bigarray.Array1.dim ba) (fun i ->
             Bigarray.Array1.unsafe_get ba i)

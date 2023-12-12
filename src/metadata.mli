@@ -19,7 +19,7 @@ module Make : functor (_ : CharEncoding.T) -> sig
   type bigarray =
     (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-  type value = [ `String of string | `Bigarray of bigarray ]
+  type value = [ `String of string | `Float of float | `Bigarray of bigarray ]
   type metadata = (string * value) list
 
   val recode :

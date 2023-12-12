@@ -4,7 +4,7 @@ exception Invalid
 type bigarray =
   (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-type value = [ `String of string | `Bigarray of bigarray ]
+type value = [ `String of string | `Float of float | `Bigarray of bigarray ]
 type metadata = (string * value) list
 type endianness = Big_endian | Little_endian
 
@@ -13,6 +13,7 @@ module Reader = struct
       returning the number of bytes actually read. *)
   type t = {
     read : bytes -> int -> int -> int;
+    read_ba : (int -> bigarray) option;
     seek : int -> unit;
     size : unit -> int option;
     reset : unit -> unit;
@@ -84,6 +85,11 @@ module Reader = struct
     let fd = Unix.openfile fname [Unix.O_RDONLY; Unix.O_CLOEXEC] 0o644 in
     let file =
       let read = Unix.read fd in
+      let read_ba len =
+        let pos = Int64.of_int (Unix.lseek fd 0 Unix.SEEK_CUR) in
+        Bigarray.array1_of_genarray
+          (Unix.map_file ~pos fd Bigarray.char Bigarray.c_layout false [| len |])
+      in
       let seek n = ignore (Unix.lseek fd n Unix.SEEK_CUR) in
       let size () =
         try
@@ -94,7 +100,7 @@ module Reader = struct
         with _ -> None
       in
       let reset () = ignore (Unix.lseek fd 0 Unix.SEEK_SET) in
-      { read; seek; size; reset }
+      { read; read_ba = Some read_ba; seek; size; reset }
     in
     try
       let ans = f file in
@@ -117,7 +123,7 @@ module Reader = struct
     let seek n = pos := !pos + n in
     let reset () = pos := 0 in
     let size () = Some len in
-    f { read; seek; size; reset }
+    f { read; read_ba = None; seek; size; reset }
 end
 
 module Int = struct
