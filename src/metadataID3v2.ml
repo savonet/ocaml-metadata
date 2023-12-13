@@ -93,7 +93,7 @@ let make_recode recode =
   fun encoding s -> recode encoding (unterminate encoding s)
 
 (** Parse ID3v2 tags. *)
-let parse ?recode ?(max_size=max_int) f : metadata =
+let parse ?recode ?(max_size=max_int) ?on_bigarray f : metadata =
   let recode = make_recode recode in
   let id = R.read f 3 in
   if id <> "ID3" then raise Invalid;
@@ -130,7 +130,12 @@ let parse ?recode ?(max_size=max_int) f : metadata =
         let size = read_frame_size f in
         (* make sure that we remain within the bounds in case of a problem *)
         let size = min size (!len - 10) in
-        if size > max_size then R.drop f size
+        if size > max_size then
+          (
+            match f.R.read_ba, on_bigarray with
+            | Some read, Some on_bigarray -> on_bigarray (normalize_id id) (read size)
+            | _ -> R.drop f size
+          )
         else
           let flags = if v = 2 then None else Some (R.read f 2) in
           let data = R.read f size in
