@@ -1,7 +1,7 @@
 open MetadataBase
 module R = Reader
 
-let parse ?max_size:_ f : metadata =
+let parse f : metadata =
   (* Start of image *)
   if R.read f 2 <> "\xff\xd8" then raise Invalid;
   let metadata = ref [] in
@@ -42,4 +42,4 @@ let parse ?max_size:_ f : metadata =
   read_maker ();
   List.rev !metadata
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

@@ -1,16 +1,25 @@
 (** Raised when the format is invalid. *)
 exception Invalid
 
-type bigarray = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+type bigarray =
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+
 type metadata = (string * string) list
 type endianness = Big_endian | Little_endian
 
+type custom_parser =
+  ?read_ba:(unit -> bigarray) ->
+  read:(unit -> string) ->
+  length:int ->
+  label:string ->
+  unit ->
+  unit
+
 module Reader = struct
-  (** A function to read taking the buffer to fill the offset and the length and
-      returning the number of bytes actually read. *)
   type t = {
     read : bytes -> int -> int -> int;
     read_ba : (int -> bigarray) option;
+    custom_parser : custom_parser option;
     seek : int -> unit;
     size : unit -> int option;
     reset : unit -> unit;
@@ -33,6 +42,28 @@ module Reader = struct
     let k = retry f.read s 0 n in
     if k <> n then raise Invalid;
     Bytes.unsafe_to_string s
+
+  let read_tag ~length ~label f =
+    let is_custom =
+      match f.custom_parser with
+        | None -> false
+        | Some custom_parser ->
+            let is_custom = ref false in
+            let read () =
+              is_custom := true;
+              read f length
+            in
+            let read_ba =
+              Option.map
+                (fun read_ba () ->
+                  is_custom := true;
+                  read_ba length)
+                f.read_ba
+            in
+            custom_parser ?read_ba ~read ~length ~label ();
+            !is_custom
+    in
+    if is_custom then None else Some (read f length)
 
   let drop f n = f.seek n
   let byte f = int_of_char (read f 1).[0]
@@ -74,18 +105,21 @@ module Reader = struct
     (b0 lsl 24) + (b1 lsl 16) + (b2 lsl 8) + b3
 
   let size f = f.size ()
-
-  (** Go back at the beginning of the stream. *)
   let reset f = f.reset ()
 
-  let with_file f fname =
+  let with_file ?custom_parser f fname =
     let fd = Unix.openfile fname [Unix.O_RDONLY; Unix.O_CLOEXEC] 0o644 in
     let file =
       let read = Unix.read fd in
       let read_ba len =
         let pos = Int64.of_int (Unix.lseek fd 0 Unix.SEEK_CUR) in
-        Bigarray.array1_of_genarray
-          (Unix.map_file ~pos fd Bigarray.char Bigarray.c_layout false [| len |])
+        let ba =
+          Bigarray.array1_of_genarray
+            (Unix.map_file ~pos fd Bigarray.char Bigarray.c_layout false
+               [| len |])
+        in
+        ignore (Unix.lseek fd len Unix.SEEK_CUR);
+        ba
       in
       let seek n = ignore (Unix.lseek fd n Unix.SEEK_CUR) in
       let size () =
@@ -97,7 +131,7 @@ module Reader = struct
         with _ -> None
       in
       let reset () = ignore (Unix.lseek fd 0 Unix.SEEK_SET) in
-      { read; read_ba = Some read_ba; seek; size; reset }
+      { read; read_ba = Some read_ba; seek; size; reset; custom_parser }
     in
     try
       let ans = f file in
@@ -108,7 +142,7 @@ module Reader = struct
       Unix.close fd;
       Printexc.raise_with_backtrace e bt
 
-  let with_string f s =
+  let with_string ?custom_parser f s =
     let len = String.length s in
     let pos = ref 0 in
     let read b ofs n =
@@ -120,7 +154,7 @@ module Reader = struct
     let seek n = pos := !pos + n in
     let reset () = pos := 0 in
     let size () = Some len in
-    f { read; read_ba = None; seek; size; reset }
+    f { read; read_ba = None; seek; size; reset; custom_parser }
 end
 
 module Int = struct

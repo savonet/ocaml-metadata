@@ -1,7 +1,7 @@
 open MetadataBase
 module R = Reader
 
-let parse ?max_size:_ f : metadata =
+let parse f : metadata =
   let id = R.read f 4 in
   if id <> "fLaC" then raise Invalid;
   let tags = ref [] in
@@ -32,17 +32,19 @@ let parse ?max_size:_ f : metadata =
               | None -> ()
           done;
           R.drop f (len - !n)
-      | 6 ->
+      | 6 -> (
           (* Picture *)
-          let picture = R.read f len in
-          tags := ("metadata_block_picture", picture) :: !tags
+          match R.read_tag ~length:len ~label:"metadata_block_picture" f with
+            | None -> ()
+            | Some picture ->
+                tags := ("metadata_block_picture", picture) :: !tags)
       | _ -> R.drop f len);
     if not last then block ()
   in
   block ();
   List.rev !tags
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file
 
 type picture = {
   picture_type : int;
