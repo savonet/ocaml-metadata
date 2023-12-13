@@ -20,10 +20,9 @@ let () =
   List.iter (fun (k,v) -> Printf.printf "- %s: %s\n" k v) metadata
 ```
 
-In the above example, the function `Metadata.Any.parse_file`{.ocaml} takes a
-file name as argument and returns an association list describing its
-metadata. It consists of pairs of strings being the name of the metadata and its
-value.
+In the above example, the function `Metadata.Any.parse_file` takes a file name
+as argument and returns an association list describing its metadata. It consists
+of pairs of strings being the name of the metadata and its value.
 
 Installing
 ----------
