@@ -2,6 +2,7 @@
 =====
 - Add basic example.
 - Add max_size parameter in order to limit the size of parsed tags.
+- id3v2: add on_bigarray
 
 0.2.0 (2023-07-01)
 =====

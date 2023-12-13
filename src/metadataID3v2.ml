@@ -92,7 +92,9 @@ let make_recode recode =
   in
   fun encoding s -> recode encoding (unterminate encoding s)
 
-(** Parse ID3v2 tags. *)
+(** Parse ID3v2 tags. When tags are larger than max_size they are dropped unless
+    the function on_bigarray is set as argument, in which case they are passed
+    to it. *)
 let parse ?recode ?(max_size=max_int) ?on_bigarray f : metadata =
   let recode = make_recode recode in
   let id = R.read f 3 in
@@ -188,7 +190,7 @@ let parse ?recode ?(max_size=max_int) ?on_bigarray f : metadata =
   done;
   List.rev !tags
 
-let parse_file ?recode ?max_size = R.with_file (parse ?recode ?max_size)
+let parse_file ?recode ?max_size ?on_bigarray = R.with_file (parse ?recode ?max_size ?on_bigarray)
 
 (** Dump ID3v2 header. *)
 let dump f =
