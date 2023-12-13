@@ -30,14 +30,7 @@ Installing
 The preferred way is via opam:
 
 ```bash
-opam pin add .
 opam install metadata
-```
-
-It can also be installed via dune:
-
-```
-dune install
 ```
 
 Other libraries
