@@ -95,7 +95,7 @@ let make_recode recode =
   fun encoding s -> recode encoding (unterminate encoding s)
 
 (** Parse ID3v2 tags. *)
-let parse ?recode f : metadata =
+let parse ?(bigarray_threshold = bigarray_threshold) ?recode f : metadata =
   let recode = make_recode recode in
   let id = R.read f 3 in
   if id <> "ID3" then raise Invalid;
@@ -191,7 +191,8 @@ let parse ?recode f : metadata =
   done;
   List.rev !tags
 
-let parse_file ?recode = R.with_file (parse ?recode)
+let parse_file ?bigarray_threshold ?recode =
+  R.with_file (parse ?recode ?bigarray_threshold)
 
 (** Dump ID3v2 header. *)
 let dump f =

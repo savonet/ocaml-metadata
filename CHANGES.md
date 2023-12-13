@@ -1,3 +1,9 @@
+0.3.0 (unreleased)
+=====
+- Add support for bigarray values
+- Use `Unix.map_file` to represent large
+  metadata values.
+
 0.2.0 (2023-07-01)
 =====
 - Add support for FLAC.

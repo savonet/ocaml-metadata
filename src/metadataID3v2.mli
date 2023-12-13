@@ -5,32 +5,17 @@ val read_size_v2 : R.t -> int
 val unterminate : int -> string -> string
 val next_substring : int -> ?offset:int -> string -> int
 val normalize_id : string -> string
-
-val make_recode :
-  (?source:[ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
-  ?target:[ `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
-  string ->
-  string)
-  option ->
-  int ->
-  string ->
-  string
+val make_recode : MetadataCharEncoding.recode option -> int -> string -> string
 
 val parse :
-  ?recode:
-    (?source:[ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
-    ?target:[ `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
-    string ->
-    string) ->
+  ?bigarray_threshold:int ->
+  ?recode:MetadataCharEncoding.recode ->
   R.t ->
   MetadataBase.metadata
 
 val parse_file :
-  ?recode:
-    (?source:[ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
-    ?target:[ `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
-    string ->
-    string) ->
+  ?bigarray_threshold:int ->
+  ?recode:MetadataCharEncoding.recode ->
   string ->
   MetadataBase.metadata
 
