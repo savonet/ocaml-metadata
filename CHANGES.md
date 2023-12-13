@@ -1,3 +1,7 @@
+0.3.0 (unreleased)
+=====
+- Added basic example.
+
 0.2.0 (2023-07-01)
 =====
 - Add support for FLAC.

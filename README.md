@@ -8,12 +8,29 @@ supported:
 - image formats: jpeg and png
 - video formats: mp4 and avi
 
+Usage
+-----
+
+Basic usage is
+
+```ocaml
+let () =
+  let filename = "test.mp3" in
+  let metadata = Metadata.Any.parse_file filename in
+  List.iter (fun (k,v) -> Printf.printf "- %s: %s\n" k v) metadata
+```
+
+In the above example, the function `Metadata.Any.parse_file`{.ocaml} takes a
+file name as argument and returns an association list describing its
+metadata. It consists of pairs of strings being the name of the metadata and its
+value.
+
 Installing
 ----------
 
 The preferred way is via opam:
 
-```
+```bash
 opam pin add .
 opam install metadata
 ```

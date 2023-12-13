@@ -4,6 +4,11 @@
  (libraries str metadata))
 
 (executable
+ (name basic)
+ (modules basic)
+ (libraries metadata))
+
+(executable
  (name dump)
  (modules dump)
  (libraries metadata))
@@ -28,6 +33,7 @@
   (glob_files id3v2/*.mp3))
  (action
   (progn
+   (run ./basic.exe)
    (run ./test.exe)
    (run ./meta.exe %{deps}))))
 
