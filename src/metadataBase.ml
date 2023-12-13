@@ -4,7 +4,10 @@ exception Invalid
 type metadata = (string * string) list
 type endianness = Big_endian | Little_endian
 
+(** Abstractions for accessing data from various sources (files, strings,
+    etc.). *)
 module Reader = struct
+
   (** A function to read taking the buffer to fill the offset and the length and
       returning the number of bytes actually read. *)
   type t = {

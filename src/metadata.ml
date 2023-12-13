@@ -11,6 +11,7 @@ module Make (E : CharEncoding.T) = struct
   module AVI = MetadataAVI
   module MP4 = MetadataMP4
 
+  (** Charset conversion function. *)
   let recode = E.convert
 
   module ID3 = struct
@@ -59,8 +60,15 @@ module Make (E : CharEncoding.T) = struct
 
   module Any = struct
     let parsers = Audio.parsers @ Image.parsers @ Video.parsers
+
+    (** Genering parsing of metadata. *)
     let parse = first_valid parsers
+
+    (** Parse the metadatas of a file. *)
     let parse_file = Reader.with_file parse
+
+    (** Parse the metadatas of a string. *)
+    let parse_string = Reader.with_string parse
   end
 
   include Any
