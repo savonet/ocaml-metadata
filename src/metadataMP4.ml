@@ -13,7 +13,7 @@ let tagn =
     ("\xa9cmt", "comment");
   ]
 
-let parse f : metadata =
+let parse ?max_size:_ f : metadata =
   let len = R.int32_be f in
   if R.read f 4 <> "ftyp" then raise Invalid;
   R.drop f (len - 8);

@@ -5,7 +5,7 @@ let trim s =
   match String.index_opt s '\000' with Some n -> String.sub s 0 n | None -> s
 
 (** Parse ID3v1 tags. *)
-let parse ?(recode = MetadataCharEncoding.Naive.convert) f : metadata =
+let parse ?(recode = MetadataCharEncoding.Naive.convert) ?max_size:_ f : metadata =
   let size = match R.size f with Some n -> n | None -> raise Invalid in
   R.drop f (size - 128);
   if R.read f 3 <> "TAG" then raise Invalid;

@@ -16,7 +16,7 @@ let tagn =
     ("ISFT", "encoder");
   ]
 
-let parse f : metadata =
+let parse ?max_size:_ f : metadata =
   if R.read f 4 <> "RIFF" then raise Invalid;
   let _ (* file size *) = R.int32_le f in
   if R.read f 4 <> "AVI " then raise Invalid;

@@ -1,7 +1,7 @@
 open MetadataBase
 module R = Reader
 
-let parse f : metadata =
+let parse ?max_size:_ f : metadata =
   let id = R.read f 4 in
   if id <> "fLaC" then raise Invalid;
   let tags = ref [] in

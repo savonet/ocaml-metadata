@@ -93,7 +93,7 @@ let make_recode recode =
   fun encoding s -> recode encoding (unterminate encoding s)
 
 (** Parse ID3v2 tags. *)
-let parse ?recode f : metadata =
+let parse ?recode ?(max_size=max_int) f : metadata =
   let recode = make_recode recode in
   let id = R.read f 3 in
   if id <> "ID3" then raise Invalid;
@@ -125,63 +125,65 @@ let parse ?recode f : metadata =
       let id_len = min !len id_len in
       let id = R.read f (min !len id_len) in
       if id = "\000\000\000\000" || id = "\000\000\000" then len := 0
-        (* stop tag *)
+      (* stop tag *)
       else (
         let size = read_frame_size f in
         (* make sure that we remain within the bounds in case of a problem *)
         let size = min size (!len - 10) in
-        let flags = if v = 2 then None else Some (R.read f 2) in
-        let data = R.read f size in
-        len := !len - (size + 10);
-        let compressed =
-          match flags with
+        if size > max_size then R.drop f size
+        else
+          let flags = if v = 2 then None else Some (R.read f 2) in
+          let data = R.read f size in
+          len := !len - (size + 10);
+          let compressed =
+            match flags with
             | None -> false
             | Some flags -> int_of_char flags.[1] land 0b10000000 <> 0
-        in
-        let encrypted =
-          match flags with
+          in
+          let encrypted =
+            match flags with
             | None -> false
             | Some flags -> int_of_char flags.[1] land 0b01000000 <> 0
-        in
-        if compressed || encrypted then raise Exit;
-        let len = String.length data in
-        if List.mem id ["SEEK"] then ()
-        else if id = "TXXX" then (
-          let encoding = int_of_char data.[0] in
-          let data = String.sub data 1 (len - 1) in
-          let recode = recode encoding in
-          let id, data =
-            let n = next_substring encoding data in
-            (String.sub data 0 n, String.sub data n (String.length data - n))
           in
-          let id = recode id in
-          let data = recode data in
-          tags := (id, data) :: !tags)
-        else if id = "COMM" then (
-          let encoding = int_of_char data.[0] in
-          let recode = recode encoding in
-          let data = String.sub data 1 (len - 1) in
-          (* We ignore the language description of the comment. *)
-          let n = try next_substring encoding data with Not_found -> 0 in
-          let data = String.sub data n (String.length data - n) |> recode in
-          tags := ("comment", data) :: !tags)
-        else if id.[0] = 'T' || id = "COMM" then (
-          let encoding = int_of_char data.[0] in
-          let recode = recode encoding in
-          let data = String.sub data 1 (len - 1) |> recode in
-          if id = "TLEN" then (
-            match int_of_string_opt data with
+          if compressed || encrypted then raise Exit;
+          let len = String.length data in
+          if List.mem id ["SEEK"] then ()
+          else if id = "TXXX" then (
+            let encoding = int_of_char data.[0] in
+            let data = String.sub data 1 (len - 1) in
+            let recode = recode encoding in
+            let id, data =
+              let n = next_substring encoding data in
+              (String.sub data 0 n, String.sub data n (String.length data - n))
+            in
+            let id = recode id in
+            let data = recode data in
+            tags := (id, data) :: !tags)
+          else if id = "COMM" then (
+            let encoding = int_of_char data.[0] in
+            let recode = recode encoding in
+            let data = String.sub data 1 (len - 1) in
+            (* We ignore the language description of the comment. *)
+            let n = try next_substring encoding data with Not_found -> 0 in
+            let data = String.sub data n (String.length data - n) |> recode in
+            tags := ("comment", data) :: !tags)
+          else if id.[0] = 'T' || id = "COMM" then (
+            let encoding = int_of_char data.[0] in
+            let recode = recode encoding in
+            let data = String.sub data 1 (len - 1) |> recode in
+            if id = "TLEN" then (
+              match int_of_string_opt data with
               | Some n ->
-                  tags :=
-                    ("duration", string_of_float (float n /. 1000.)) :: !tags
+                tags :=
+                  ("duration", string_of_float (float n /. 1000.)) :: !tags
               | None -> ())
+            else tags := (normalize_id id, data) :: !tags)
           else tags := (normalize_id id, data) :: !tags)
-        else tags := (normalize_id id, data) :: !tags)
     with Exit -> ()
   done;
   List.rev !tags
 
-let parse_file ?recode = R.with_file (parse ?recode)
+let parse_file ?recode ?max_size = R.with_file (parse ?recode ?max_size)
 
 (** Dump ID3v2 header. *)
 let dump f =

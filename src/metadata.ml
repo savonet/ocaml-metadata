@@ -14,14 +14,14 @@ module Make (E : CharEncoding.T) = struct
   let recode = E.convert
 
   module ID3 = struct
-    let parse f =
+    let parse ?max_size f =
       let failure, v2 =
-        try (false, ID3v2.parse ~recode f) with _ -> (true, [])
+        try (false, ID3v2.parse ~recode ?max_size f) with _ -> (true, [])
       in
       let v1 =
         try
           Reader.reset f;
-          ID3v1.parse ~recode f
+          ID3v1.parse ~recode ?max_size f
         with _ -> if failure then raise Invalid else []
       in
       v2 @ v1
@@ -30,10 +30,10 @@ module Make (E : CharEncoding.T) = struct
   end
 
   (** Return the first application which does not raise invalid. *)
-  let rec first_valid l file =
+  let rec first_valid l ?(max_size : int option) file =
     match l with
       | f :: l -> (
-          try f file
+          try f ?max_size file
           with Invalid ->
             Reader.reset file;
             first_valid l file)

@@ -1,7 +1,7 @@
 open MetadataBase
 module R = Reader
 
-let parse f : metadata =
+let parse ?max_size:_ f : metadata =
   (* Packetized reading *)
   let f, peek =
     (* Current page *)
@@ -48,7 +48,7 @@ let parse f : metadata =
       Bytes.blit_string !page 0 buf 0 n;
       Bytes.unsafe_to_string buf
     in
-    ( { R.read; seek; size = (fun () -> None); reset = (fun () -> assert false) },
+    ( { R.read; read_ba = None; seek; size = (fun () -> None); reset = (fun () -> assert false) },
       peek )
   in
   let comments () =

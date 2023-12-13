@@ -1,6 +1,7 @@
 0.3.0 (unreleased)
 =====
-- Added basic example.
+- Add basic example.
+- Add max_size parameter in order to limit the size of parsed tags.
 
 0.2.0 (2023-07-01)
 =====

@@ -1,7 +1,7 @@
 open MetadataBase
 module R = Reader
 
-let parse f : metadata =
+let parse ?max_size:_ f : metadata =
   if R.read f 8 <> "\x89PNG\x0d\x0a\x1a\x0a" then raise Invalid;
   let _ = R.int32_be f in
   if R.read f 4 <> "IHDR" then raise Invalid;
