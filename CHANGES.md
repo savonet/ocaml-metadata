@@ -1,5 +1,6 @@
 0.3.0 (unreleased)
 =====
+- Add basic example.
 - Add support for bigarray values
 - Use `Unix.map_file` to represent large
   metadata values.

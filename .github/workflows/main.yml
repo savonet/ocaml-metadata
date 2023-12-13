@@ -4,10 +4,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: ocaml/setup-ocaml@v2
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup OCaml
+      uses: ocaml/setup-ocaml@v2
       with:
-        ocaml-compiler: 4.14.0
+        ocaml-compiler: 5.00
     - name: Install required packages
       run: sudo apt install ffmpeg
     - name: Pin package
