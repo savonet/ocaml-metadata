@@ -49,7 +49,7 @@ let () =
       Printf.printf "\n# Metadata for %s\n\n%!" fname;
       (* Store "APIC" as custom tag. *)
       let apic_tag = ref None in
-      let custom_parser ?read_ba ~read:_ ~length:_ ~label () =
+      let custom_parser { Metadata.read_ba; label; _ } =
         match (label, read_ba) with
           | "APIC", Some r -> apic_tag := Some (r ())
           | _ -> ()

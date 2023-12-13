@@ -7,15 +7,19 @@ type bigarray =
 type metadata = (string * string) list
 type endianness = Big_endian | Little_endian
 
-type custom_parser =
-  ?read_ba:(unit -> bigarray) ->
-  read:(unit -> string) ->
-  length:int ->
-  label:string ->
-  unit ->
-  unit
+type parser_handler = {
+  label : string;
+  length : int;
+  read : unit -> string;
+  read_ba : (unit -> bigarray) option;
+  skip : unit -> unit;
+}
+
+type custom_parser = parser_handler -> unit
 
 module Reader = struct
+  (** A function to read taking the buffer to fill the offset and the length and
+      returning the number of bytes actually read. *)
   type t = {
     read : bytes -> int -> int -> int;
     read_ba : (int -> bigarray) option;
@@ -49,6 +53,10 @@ module Reader = struct
         | None -> false
         | Some custom_parser ->
             let is_custom = ref false in
+            let skip () =
+              is_custom := true;
+              f.seek length
+            in
             let read () =
               is_custom := true;
               read f length
@@ -60,7 +68,7 @@ module Reader = struct
                   read_ba length)
                 f.read_ba
             in
-            custom_parser ?read_ba ~read ~length ~label ();
+            custom_parser { read_ba; read; skip; length; label };
             !is_custom
     in
     if is_custom then None else Some (read f length)

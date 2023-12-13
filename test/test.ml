@@ -64,7 +64,7 @@ let () =
         ]
   in
   let custom_parser_labels = ref [] in
-  let custom_parser ?read_ba:_ ~read ~length ~label () =
+  let custom_parser { Metadata.read; length; label; _ } =
     custom_parser_labels := label :: !custom_parser_labels;
     match label with
       | "TIT2" ->

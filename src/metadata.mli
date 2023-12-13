@@ -18,13 +18,15 @@ module Make : functor (_ : CharEncoding.T) -> sig
 
       Currently only supported for: ID3v2, MP4 and [metadata_block_picture] in
       FLAC metadata. *)
-  type custom_parser =
-    ?read_ba:(unit -> bigarray) ->
-    read:(unit -> string) ->
-    length:int ->
-    label:string ->
-    unit ->
-    unit
+  type parser_handler = MetadataBase.parser_handler = {
+    label : string;
+    length : int;
+    read : unit -> string;
+    read_ba : (unit -> bigarray) option;
+    skip : unit -> unit;
+  }
+
+  type custom_parser = parser_handler -> unit
 
   module Reader : sig
     (** A function to read taking the buffer to fill the offset and the length and
@@ -38,20 +40,6 @@ module Make : functor (_ : CharEncoding.T) -> sig
       reset : unit -> unit;
     }
 
-    val read : t -> int -> string
-    val drop : t -> int -> unit
-    val byte : t -> int
-    val uint8 : t -> int
-    val int16_be : t -> int
-    val int16_le : t -> int
-    val uint16_le : t -> int
-    val int16 : endianness -> t -> int
-    val int24_be : t -> int
-    val int32_le : t -> int
-    val uint32_le : t -> int
-    val int32_be : t -> int
-    val size : t -> int option
-
     (** Go back at the beginning of the stream. *)
     val reset : t -> unit
 
@@ -60,40 +48,6 @@ module Make : functor (_ : CharEncoding.T) -> sig
 
     val with_string :
       ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
-  end
-
-  module Int : sig
-    type t = int
-
-    val zero : int
-    val one : int
-    val minus_one : int
-    external neg : int -> int = "%negint"
-    external add : int -> int -> int = "%addint"
-    external sub : int -> int -> int = "%subint"
-    external mul : int -> int -> int = "%mulint"
-    external div : int -> int -> int = "%divint"
-    external rem : int -> int -> int = "%modint"
-    external succ : int -> int = "%succint"
-    external pred : int -> int = "%predint"
-    val abs : int -> int
-    val max_int : int
-    val min_int : int
-    external logand : int -> int -> int = "%andint"
-    external logor : int -> int -> int = "%orint"
-    external logxor : int -> int -> int = "%xorint"
-    val lognot : int -> int
-    external shift_left : int -> int -> int = "%lslint"
-    external shift_right : int -> int -> int = "%asrint"
-    external shift_right_logical : int -> int -> int = "%lsrint"
-    val equal : int -> int -> bool
-    val compare : int -> int -> int
-    val min : int -> int -> int
-    val max : int -> int -> int
-    external to_float : int -> float = "%floatofint"
-    external of_float : float -> int = "%intoffloat"
-    val to_string : int -> string
-    val find : (int -> bool) -> int
   end
 
   module ID3v1 = MetadataID3v1
@@ -151,13 +105,12 @@ module Make : functor (_ : CharEncoding.T) -> sig
 
     val parse_file :
       ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+
+    val parse_string :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
-  val parsers : (Reader.t -> MetadataBase.metadata) list
-  val parse : Reader.t -> MetadataBase.metadata
-
-  val parse_file :
-    ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+  include module type of Any
 end
 
 include module type of Make (CharEncoding.Naive)
