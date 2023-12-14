@@ -13,6 +13,7 @@ module type T = sig
   val convert : recode
 end
 
-(** Basic charset conversion. This module is not complete and we advise the use
-    of libraries such as camomile. *)
+(** Basic charset conversion. The conversion routine implemented in this
+    module is not able to detect encoding. We recommend using a
+    library such as camomile for a more complete solution. *)
 module Naive : T
