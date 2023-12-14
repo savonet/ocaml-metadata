@@ -110,3 +110,5 @@ module Make : functor (_ : CharEncoding.T) -> sig
 end
 
 include module type of Make (CharEncoding.Naive)
+
+val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
