@@ -1,7 +1,7 @@
 open MetadataBase
 module R = Reader
 
-let parse ?max_size:_ f : metadata =
+let parse f : metadata =
   (* Packetized reading *)
   let f, peek =
     (* Current page *)
@@ -48,7 +48,14 @@ let parse ?max_size:_ f : metadata =
       Bytes.blit_string !page 0 buf 0 n;
       Bytes.unsafe_to_string buf
     in
-    ( { R.read; read_ba = None; seek; size = (fun () -> None); reset = (fun () -> assert false) },
+    ( {
+        R.read;
+        read_ba = None;
+        custom_parser = None;
+        seek;
+        size = (fun () -> None);
+        reset = (fun () -> assert false);
+      },
       peek )
   in
   let comments () =
@@ -109,4 +116,4 @@ let parse ?max_size:_ f : metadata =
     if R.read f 6 <> "vorbis" then raise Invalid;
     comments ())
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

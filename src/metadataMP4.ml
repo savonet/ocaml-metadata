@@ -13,7 +13,7 @@ let tagn =
     ("\xa9cmt", "comment");
   ]
 
-let parse ?max_size:_ f : metadata =
+let parse f : metadata =
   let len = R.int32_be f in
   if R.read f 4 <> "ftyp" then raise Invalid;
   R.drop f (len - 8);
@@ -40,16 +40,18 @@ let parse ?max_size:_ f : metadata =
           if len < 16 then raise Invalid;
           let data_type = R.int32_be f in
           let _ = R.read f 4 in
-          let value = R.read f (len - 16) in
-          match (data_type, List.assoc_opt tag tagn) with
-            | 1, Some tag -> ans := (tag, value) :: !ans
-            | 2, Some tag ->
-                ans :=
-                  ( tag,
-                    MetadataCharEncoding.Naive.convert ~source:`UTF_16BE value
-                  )
-                  :: !ans
-            | _ -> ())
+          match R.read_tag ~label:tag ~length:(len - 16) f with
+            | None -> ()
+            | Some value -> (
+                match (data_type, List.assoc_opt tag tagn) with
+                  | 1, Some tag -> ans := (tag, value) :: !ans
+                  | 2, Some tag ->
+                      ans :=
+                        ( tag,
+                          MetadataCharEncoding.Naive.convert ~source:`UTF_16BE
+                            value )
+                        :: !ans
+                  | _ -> ()))
       | _ -> R.drop f (len - 8));
     len
   in
@@ -60,4 +62,4 @@ let parse ?max_size:_ f : metadata =
     assert false
   with _ -> List.rev !ans
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

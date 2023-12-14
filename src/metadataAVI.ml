@@ -16,7 +16,7 @@ let tagn =
     ("ISFT", "encoder");
   ]
 
-let parse ?max_size:_ f : metadata =
+let parse f : metadata =
   if R.read f 4 <> "RIFF" then raise Invalid;
   let _ (* file size *) = R.int32_le f in
   if R.read f 4 <> "AVI " then raise Invalid;
@@ -33,18 +33,20 @@ let parse ?max_size:_ f : metadata =
             while !remaining > 0 do
               let tag = R.read f 4 in
               let size = R.int32_le f in
-              let s = R.read f (size - 1) in
-              R.drop f 1;
-              (* null-terminated *)
-              let padding = size mod 2 in
-              R.drop f padding;
-              remaining := !remaining - (8 + size + padding);
-              let tag =
-                match List.assoc_opt tag tagn with
-                  | Some tag -> tag
-                  | None -> tag
-              in
-              ans := (tag, s) :: !ans
+              match R.read_tag ~length:(size - 1) ~label:tag f with
+                | None -> ()
+                | Some s ->
+                    R.drop f 1;
+                    (* null-terminated *)
+                    let padding = size mod 2 in
+                    R.drop f padding;
+                    remaining := !remaining - (8 + size + padding);
+                    let tag =
+                      match List.assoc_opt tag tagn with
+                        | Some tag -> tag
+                        | None -> tag
+                    in
+                    ans := (tag, s) :: !ans
             done
         | "movi" -> raise Exit (* stop parsing there *)
         | _ -> R.drop f (size - 4))
@@ -56,4 +58,4 @@ let parse ?max_size:_ f : metadata =
     assert false
   with _ -> List.rev !ans
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

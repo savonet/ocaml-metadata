@@ -1,8 +1,8 @@
 0.3.0 (unreleased)
 =====
 - Add basic example.
-- Add max_size parameter in order to limit the size of parsed tags.
-- id3v2: add on_bigarray
+- Add optional custom parser argument to override the
+  default parsing mechanism.
 
 0.2.0 (2023-07-01)
 =====

@@ -14,7 +14,8 @@ let () =
     match !format with
       | "id3" | "mp3" -> Metadata.ID3.parse_file
       | "id3v1" -> Metadata.ID3v1.parse_file
-      | "id3v2" -> fun f -> Metadata.ID3v2.parse_file f
+      | "id3v2" ->
+          fun ?custom_parser f -> Metadata.ID3v2.parse_file ?custom_parser f
       | "ogg" -> Metadata.OGG.parse_file
       | "mp4" -> Metadata.MP4.parse_file
       | "" -> Metadata.Any.parse_file
@@ -46,18 +47,28 @@ let () =
   List.iter
     (fun fname ->
       Printf.printf "\n# Metadata for %s\n\n%!" fname;
-      let m = parser fname in
+      (* Store "APIC" as custom tag. *)
+      let apic_tag = ref None in
+      let custom_parser { Metadata.read_ba; label; _ } =
+        match (label, read_ba) with
+          | "APIC", Some r -> apic_tag := Some (r ())
+          | _ -> ()
+      in
+      let m = parser ~custom_parser fname in
       List.iter
         (fun (k, v) ->
           let v =
-            if
-              k = "APIC" || k = "PIC"
-              || k = "metadata_block_picture"
-              || k = "RVA2"
-            then "<redacted>"
-            else v
+            match k with
+              | "APIC" -> assert false
+              | "PIC" | "metadata_block_picture" | "RVA2" -> "<redacted>"
+              | _ -> v
           in
           Printf.printf "- %s: %s\n%!" k v;
           if !binary then Printf.printf "  %s: %S\n%!" k v)
-        m)
+        m;
+      match !apic_tag with
+        | None -> ()
+        | Some tag ->
+            Printf.printf "- APIC: <custom tag of length %d>\n"
+              (Bigarray.Array1.dim tag))
     fname
