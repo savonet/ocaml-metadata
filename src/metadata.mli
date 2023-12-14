@@ -55,13 +55,28 @@ module Make : functor (_ : CharEncoding.T) -> sig
     val with_string : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
   end
 
+  (** ID3v1 metadata.*)
   module ID3v1 = MetadataID3v1
+
+  (** ID3v2 metadata. *)
   module ID3v2 = MetadataID3v2
+
+  (** OGG metadata. *)
   module OGG = MetadataOGG
+
+  (** Flac metadata. *)
   module FLAC = MetadataFLAC
+
+  (** Jpeg metadata. *)
   module JPEG = MetadataJPEG
+
+  (** PNG metadata. *)
   module PNG = MetadataPNG
+
+  (** AVI metadata. *)
   module AVI = MetadataAVI
+
+  (** MP4 metadata. *)
   module MP4 = MetadataMP4
 
   (** Convert the charset encoding of a string. *)

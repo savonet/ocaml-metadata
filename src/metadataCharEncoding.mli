@@ -1,3 +1,6 @@
+(** Charset conversion. *)
+
+(** Type of functions for converting charset. *)
 type recode =
   ?source:[ `ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
   ?target:[ `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ] ->
