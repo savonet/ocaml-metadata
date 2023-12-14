@@ -4,8 +4,12 @@ type recode =
   string ->
   string
 
+(** Type of modules for specifying charset conversion. *)
 module type T = sig
+  (** Convert charset. *)
   val convert : recode
 end
 
+(** Basic charset conversion. This module is not complete and we advise the use
+    of libraries such as camomile. *)
 module Naive : T
