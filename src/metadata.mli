@@ -43,11 +43,9 @@ module Make : functor (_ : CharEncoding.T) -> sig
     (** Go back at the beginning of the stream. *)
     val reset : t -> unit
 
-    val with_file :
-      ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
+    val with_file : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
 
-    val with_string :
-      ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
+    val with_string : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
   end
 
   module ID3v1 = MetadataID3v1
@@ -68,8 +66,7 @@ module Make : functor (_ : CharEncoding.T) -> sig
   module ID3 : sig
     val parse : Reader.t -> (string * string) list
 
-    val parse_file :
-      ?custom_parser:custom_parser -> string -> (string * string) list
+    val parse_file : ?custom_parser:custom_parser -> string -> (string * string) list
   end
 
   (** Return the first application which does not raise invalid. *)
@@ -77,37 +74,36 @@ module Make : functor (_ : CharEncoding.T) -> sig
 
   module Audio : sig
     val parsers : (Reader.t -> MetadataBase.metadata) list
+
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file :
-      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   module Image : sig
     val parsers : (Reader.t -> MetadataBase.metadata) list
+
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file :
-      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   module Video : sig
     val parsers : (Reader.t -> MetadataBase.metadata) list
+
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file :
-      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   module Any : sig
     val parsers : (Reader.t -> MetadataBase.metadata) list
+
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file :
-      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
 
-    val parse_string :
-      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_string : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   include module type of Any

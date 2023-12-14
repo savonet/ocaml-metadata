@@ -1,8 +1,7 @@
 0.3.0 (unreleased)
 =====
 - Add basic example.
-- Add optional custom parser argument to override the
-  default parsing mechanism.
+- Add optional custom parser argument to override the default parsing mechanism.
 
 0.2.0 (2023-07-01)
 =====
