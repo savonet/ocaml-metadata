@@ -8,7 +8,7 @@ module Make : functor (_ : CharEncoding.T) -> sig
   (** Raised when the metadata is not valid. *)
   exception Invalid
 
-  (** Metadata are represented as association lists. *)
+  (** Metadata are represented as association lists (name, value). *)
   type metadata = (string * string) list
 
   (** Bigarray representation of (large) tags. *)
