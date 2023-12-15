@@ -31,6 +31,7 @@ module Make : functor (_ : CharEncoding.T) -> sig
     skip : unit -> unit;
   }
 
+  (** A custom parser, see [parser_handler]. *)
   type custom_parser = parser_handler -> unit
 
   (** Abstractions for reading from various sources. *)
