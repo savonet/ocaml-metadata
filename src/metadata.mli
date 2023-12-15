@@ -8,8 +8,6 @@ module Make : functor (_ : CharEncoding.T) -> sig
   (** Raised when the metadata is not valid. *)
   exception Invalid
 
-  type endianness = MetadataBase.endianness
-
   (** Metadata are represented as association lists. *)
   type metadata = (string * string) list
 
@@ -35,9 +33,10 @@ module Make : functor (_ : CharEncoding.T) -> sig
 
   type custom_parser = parser_handler -> unit
 
+  (** Abstractions for reading from various sources. *)
   module Reader : sig
-    (** A function to read taking the buffer to fill the offset and the length and
-      returning the number of bytes actually read. *)
+    (** A function to read taking the buffer to fill the offset and the length
+        and returning the number of bytes actually read. *)
     type t = MetadataBase.Reader.t = {
       read : bytes -> int -> int -> int;
       read_ba : (int -> MetadataBase.bigarray) option;
@@ -50,8 +49,10 @@ module Make : functor (_ : CharEncoding.T) -> sig
     (** Go back at the beginning of the stream. *)
     val reset : t -> unit
 
+    (** Specialize a parser to operate on files. *)
     val with_file : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
 
+    (** Specialize a parser to operate on strings. *)
     val with_string : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
   end
 

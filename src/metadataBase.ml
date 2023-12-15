@@ -5,6 +5,7 @@ type bigarray =
   (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 type metadata = (string * string) list
+
 type endianness = Big_endian | Little_endian
 
 type parser_handler = {
