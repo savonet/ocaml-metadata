@@ -1,7 +1,3 @@
-module R = MetadataBase.Reader
+val parse : ?recode:MetadataCharEncoding.recode -> MetadataBase.Reader.t -> MetadataBase.metadata
 
-val trim : string -> string
-val parse : ?recode:MetadataCharEncoding.recode -> R.t -> MetadataBase.metadata
-
-val parse_file :
-  ?custom_parser:MetadataBase.custom_parser -> string -> MetadataBase.metadata
+val parse_file : ?custom_parser:MetadataBase.custom_parser -> string -> MetadataBase.metadata
