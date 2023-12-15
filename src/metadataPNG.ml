@@ -15,4 +15,4 @@ let parse f : metadata =
     ("bit_depth", string_of_int bit_depth);
   ]
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

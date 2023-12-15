@@ -42,4 +42,4 @@ let parse f : metadata =
   read_maker ();
   List.rev !metadata
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

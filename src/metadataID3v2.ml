@@ -131,8 +131,6 @@ let parse ?recode f : metadata =
         (* make sure that we remain within the bounds in case of a problem *)
         let size = min size (!len - 10) in
         let flags = if v = 2 then None else Some (R.read f 2) in
-        let data = R.read f size in
-        len := !len - (size + 10);
         let compressed =
           match flags with
             | None -> false
@@ -143,7 +141,14 @@ let parse ?recode f : metadata =
             | None -> false
             | Some flags -> int_of_char flags.[1] land 0b01000000 <> 0
         in
-        if compressed || encrypted then raise Exit;
+        if compressed || encrypted then (
+          ignore (R.read f size);
+          len := !len - (size + 10);
+          raise Exit);
+        let tag = R.read_tag ~label:id ~length:size f in
+        len := !len - (size + 10);
+        if tag = None then raise Exit;
+        let data = Option.get tag in
         let len = String.length data in
         if List.mem id ["SEEK"] then ()
         else if id = "TXXX" then (
@@ -165,23 +170,18 @@ let parse ?recode f : metadata =
           let n = try next_substring encoding data with Not_found -> 0 in
           let data = String.sub data n (String.length data - n) |> recode in
           tags := ("comment", data) :: !tags)
-        else if id.[0] = 'T' || id = "COMM" then (
+        else if id.[0] = 'T' then (
           let encoding = int_of_char data.[0] in
           let recode = recode encoding in
           let data = String.sub data 1 (len - 1) |> recode in
-          if id = "TLEN" then (
-            match int_of_string_opt data with
-              | Some n ->
-                  tags :=
-                    ("duration", string_of_float (float n /. 1000.)) :: !tags
-              | None -> ())
-          else tags := (normalize_id id, data) :: !tags)
+          tags := (normalize_id id, data) :: !tags)
         else tags := (normalize_id id, data) :: !tags)
     with Exit -> ()
   done;
   List.rev !tags
 
-let parse_file ?recode = R.with_file (parse ?recode)
+let parse_file ?recode ?custom_parser =
+  R.with_file ?custom_parser (parse ?recode)
 
 (** Dump ID3v2 header. *)
 let dump f =

@@ -34,4 +34,4 @@ let parse ?(recode = MetadataCharEncoding.Naive.convert) f : metadata =
   ]
   |> List.filter (fun (_, v) -> v <> "")
 
-let parse_file = R.with_file parse
+let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

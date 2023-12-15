@@ -27,10 +27,10 @@ module Make (E : CharEncoding.T) = struct
       in
       v2 @ v1
 
-    let parse_file = Reader.with_file parse
+    let parse_file ?custom_parser file =
+      Reader.with_file ?custom_parser parse file
   end
 
-  (** Return the first application which does not raise invalid. *)
   let rec first_valid l file =
     match l with
       | f :: l -> (
@@ -43,19 +43,25 @@ module Make (E : CharEncoding.T) = struct
   module Audio = struct
     let parsers = [ID3.parse; OGG.parse; FLAC.parse]
     let parse = first_valid parsers
-    let parse_file = Reader.with_file parse
+
+    let parse_file ?custom_parser file =
+      Reader.with_file ?custom_parser parse file
   end
 
   module Image = struct
     let parsers = [JPEG.parse; PNG.parse]
     let parse = first_valid parsers
-    let parse_file = Reader.with_file parse
+
+    let parse_file ?custom_parser file =
+      Reader.with_file ?custom_parser parse file
   end
 
   module Video = struct
     let parsers = [AVI.parse; MP4.parse]
     let parse = first_valid parsers
-    let parse_file = Reader.with_file parse
+
+    let parse_file ?custom_parser file =
+      Reader.with_file ?custom_parser parse file
   end
 
   module Any = struct
@@ -64,11 +70,12 @@ module Make (E : CharEncoding.T) = struct
     (** Genering parsing of metadata. *)
     let parse = first_valid parsers
 
-    (** Parse the metadatas of a file. *)
-    let parse_file = Reader.with_file parse
+    let parse_file ?custom_parser file =
+      Reader.with_file ?custom_parser parse file
 
     (** Parse the metadatas of a string. *)
-    let parse_string = Reader.with_string parse
+    let parse_string ?custom_parser file =
+      Reader.with_string ?custom_parser parse file
   end
 
   include Any
