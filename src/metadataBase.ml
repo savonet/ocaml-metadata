@@ -74,6 +74,7 @@ module Reader = struct
     if is_custom then None else Some (read f length)
 
   let drop f n = f.seek n
+
   let byte f = int_of_char (read f 1).[0]
   let uint8 f = byte f
 
