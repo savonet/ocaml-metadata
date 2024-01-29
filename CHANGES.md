@@ -3,6 +3,7 @@
 
 - Add basic example.
 - Add optional custom parser argument to override the default parsing mechanism.
+- Update default metadata mappings to follow musicbrainz's picard mapping.
 - Add `MIME` module to guess MIME type of files (#4).
 
 0.2.0 (2023-07-01)
