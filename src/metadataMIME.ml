@@ -22,8 +22,13 @@ let advanced =
     String.starts_with ~prefix:"RIFF" s &&
     String.contains_at 8 ~substring:"WAVEfmt " s
   in
+  let avi s =
+    String.starts_with ~prefix:"RIFF" s &&
+    String.contains_at 8 ~substring:"AVI " s
+  in
   [
-    wav, "audio/wav"
+    wav, "audio/wav";
+    avi, "video/x-msvideo"
   ]
 
 let of_string s =
