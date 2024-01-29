@@ -5,9 +5,12 @@ let tagn =
   [
     ("\xa9nam", "title");
     ("\xa9ART", "artist");
+    ("cprt", "copyright");
     ("\xa9too", "encoder");
     ("\xa9day", "date");
     ("\xa9cpy", "copyright");
+    ("\xa9gen", "genre");
+    ("\xa9wrt", "composer");
     ("\xa9alb", "album");
     ("\xa9des", "description");
     ("\xa9cmt", "comment");
