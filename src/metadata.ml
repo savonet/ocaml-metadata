@@ -1,5 +1,7 @@
 module CharEncoding = MetadataCharEncoding
 
+module MIME = MetadataMIME
+
 module Make (E : CharEncoding.T) = struct
   include MetadataBase
   module ID3v1 = MetadataID3v1

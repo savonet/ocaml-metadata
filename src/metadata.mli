@@ -3,6 +3,16 @@
 (** Functions for handling charset conversion. *)
 module CharEncoding = MetadataCharEncoding
 
+(** Guess the MIME type of a file. *)
+module MIME : sig
+  (** Guess the MIME type from file contents. Raises [Not_found] if none was
+      found. *)
+  val of_string : string -> string
+
+  (** Same as [of_string] but takes a file name as argument. *)
+  val of_file : string -> string
+end
+
 (** Generate metadata parsers given functions for converting charsets. *)
 module Make : functor (_ : CharEncoding.T) -> sig
   (** Raised when the metadata is not valid. *)

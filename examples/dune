@@ -14,6 +14,11 @@
  (libraries metadata))
 
 (executable
+ (name mimetype)
+ (modules mimetype)
+ (libraries metadata))
+
+(executable
  (name test)
  (modules test)
  (optional)
