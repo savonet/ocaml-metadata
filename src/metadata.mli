@@ -91,6 +91,12 @@ module Make : functor (_ : CharEncoding.T) -> sig
   (** MP4 metadata. *)
   module MP4 = MetadataMP4
 
+  (** WAV metadata. *)
+  module WAV = MetadataWAV
+
+  (** RIFF metdata. *)
+  module RIFF = MetadataRIFF
+
   (** Convert the charset encoding of a string. *)
   val recode :
     ?source:[ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
