@@ -73,9 +73,7 @@
    -i
    "sine=frequency=440:sample_rate=44100:duration=10"
    -f
-   mp3
-   -write_id3v1
-   true
+   wav
    -metadata
    "title=The title"
    -metadata
