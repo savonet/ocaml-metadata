@@ -5,7 +5,7 @@
 - Add optional custom parser argument to override the default parsing mechanism.
 - Update default metadata mappings to follow musicbrainz's picard mapping.
 - Add `MIME` module to guess MIME type of files (#4).
-- Generic RIFF format parser, adds support for wave files.
+- Generic RIFF format parser, adds support for wave files (#6).
 
 0.2.0 (2023-07-01)
 =====
