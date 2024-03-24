@@ -117,6 +117,12 @@ type frame_id =
 (** String representation of a frame identifier. *)
 val string_of_frame_id : frame_id -> string
 
+(** Parse a string into a frame id. *)
+val frame_id_of_string : string -> frame_id option
+
+(** Does a frame contain binary data? *)
+val binary_frame : frame_id -> bool
+
 (** Charset for encoding text. *)
 type text_encoding = [ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ]
 
@@ -132,5 +138,6 @@ val default_flags : frame_id -> frame_flag list
 (** A ID3 frame. *)
 type frame = { id : frame_id; data : frame_data; flags : frame_flag list }
 
-(** Create an ID3v2 header. *)
+(** Create an ID3v2 header. Consistency between [frame_id] and [frame_data] is not enforced and
+    left to the user to check. *)
 val make : version:int -> frame list -> string

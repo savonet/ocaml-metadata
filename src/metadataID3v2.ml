@@ -328,6 +328,89 @@ type frame_id =
   | `WPUB
   | `WXXX ]
 
+let binary_frame = function
+  | `AENC | `ENCR | `EQUA | `ETCO | `GRID | `LINK | `MCDI | `MLLT | `PRIV
+  | `PCNT | `POPM | `POSS | `RBUF | `RVAD | `RVRB | `SYTC | `UFID ->
+      true
+  | _ -> false
+
+let frame_id_of_string = function
+  | "AENC" -> Some `AENC
+  | "APIC" -> Some `APIC
+  | "COMM" -> Some `COMM
+  | "COMR" -> Some `COMR
+  | "ENCR" -> Some `ENCR
+  | "EQUA" -> Some `EQUA
+  | "ETCO" -> Some `ETCO
+  | "GEOB" -> Some `GEOB
+  | "GRID" -> Some `GRID
+  | "IPLS" -> Some `IPLS
+  | "LINK" -> Some `LINK
+  | "MCDI" -> Some `MCDI
+  | "MLLT" -> Some `MLLT
+  | "OWNE" -> Some `OWNE
+  | "PCNT" -> Some `PCNT
+  | "POPM" -> Some `POPM
+  | "POSS" -> Some `POSS
+  | "PRIV" -> Some `PRIV
+  | "RBUF" -> Some `RBUF
+  | "RVAD" -> Some `RVAD
+  | "RVRB" -> Some `RVRB
+  | "SYLT" -> Some `SYLT
+  | "SYTC" -> Some `SYTC
+  | "TALB" -> Some `TALB
+  | "TBPM" -> Some `TBPM
+  | "TCOM" -> Some `TCOM
+  | "TCON" -> Some `TCON
+  | "TCOP" -> Some `TCOP
+  | "TDAT" -> Some `TDAT
+  | "TDLY" -> Some `TDLY
+  | "TENC" -> Some `TENC
+  | "TEXT" -> Some `TEXT
+  | "TFLT" -> Some `TFLT
+  | "TIME" -> Some `TIME
+  | "TIT1" -> Some `TIT1
+  | "TIT2" -> Some `TIT2
+  | "TIT3" -> Some `TIT3
+  | "TKEY" -> Some `TKEY
+  | "TLAN" -> Some `TLAN
+  | "TLEN" -> Some `TLEN
+  | "TMED" -> Some `TMED
+  | "TOAL" -> Some `TOAL
+  | "TOFN" -> Some `TOFN
+  | "TOLY" -> Some `TOLY
+  | "TOPE" -> Some `TOPE
+  | "TORY" -> Some `TORY
+  | "TOWN" -> Some `TOWN
+  | "TPE1" -> Some `TPE1
+  | "TPE2" -> Some `TPE2
+  | "TPE3" -> Some `TPE3
+  | "TPE4" -> Some `TPE4
+  | "TPOS" -> Some `TPOS
+  | "TPUB" -> Some `TPUB
+  | "TRCK" -> Some `TRCK
+  | "TRDA" -> Some `TRDA
+  | "TRSN" -> Some `TRSN
+  | "TRSO" -> Some `TRSO
+  | "TSIZ" -> Some `TSIZ
+  | "TSRC" -> Some `TSRC
+  | "TSSE" -> Some `TSSE
+  | "TXXX" -> Some `TXXX
+  | "TYER" -> Some `TYER
+  | "UFID" -> Some `UFID
+  | "USER" -> Some `USER
+  | "USLT" -> Some `USLT
+  | "WCOM" -> Some `WCOM
+  | "WCOP" -> Some `WCOP
+  | "WOAF" -> Some `WOAF
+  | "WOAR" -> Some `WOAR
+  | "WOAS" -> Some `WOAS
+  | "WORS" -> Some `WORS
+  | "WPAY" -> Some `WPAY
+  | "WPUB" -> Some `WPUB
+  | "WXXX" -> Some `WXXX
+  | _ -> None
+
 let string_of_frame_id = function
   | `AENC -> "AENC"
   | `APIC -> "APIC"
