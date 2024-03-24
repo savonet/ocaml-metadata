@@ -414,7 +414,7 @@ let default_flags = function
   | _ -> [`Tag_alter_perservation true; `File_alter_preservation true]
 
 type text_encoding = [ `ISO_8859_1 | `UTF_8 | `UTF_16 | `UTF_16LE | `UTF_16BE ]
-type frame_data = [ `Text of text_encoding * string ]
+type frame_data = [ `Text of text_encoding * string | `Binary of string ]
 type frame = { id : frame_id; data : frame_data; flags : frame_flag list }
 
 let write_string ~buf = Buffer.add_string buf
@@ -430,6 +430,7 @@ let write_size ~buf n =
   done
 
 let render_frame_data ~version = function
+  | `Binary b -> b
   | `Text (encoding, data) ->
       let encoding, data =
         match encoding with
