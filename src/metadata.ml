@@ -1,5 +1,7 @@
 module CharEncoding = MetadataCharEncoding
 
+module MIME = MetadataMIME
+
 module Make (E : CharEncoding.T) = struct
   include MetadataBase
   module ID3v1 = MetadataID3v1
@@ -10,6 +12,8 @@ module Make (E : CharEncoding.T) = struct
   module PNG = MetadataPNG
   module AVI = MetadataAVI
   module MP4 = MetadataMP4
+  module WAV = MetadataWAV
+  module RIFF = MetadataRIFF
 
   (** Charset conversion function. *)
   let recode = E.convert
@@ -41,7 +45,7 @@ module Make (E : CharEncoding.T) = struct
       | [] -> raise Invalid
 
   module Audio = struct
-    let parsers = [ID3.parse; OGG.parse; FLAC.parse]
+    let parsers = [ID3.parse; OGG.parse; FLAC.parse; WAV.parse]
     let parse = first_valid parsers
 
     let parse_file ?custom_parser file =
@@ -65,7 +69,7 @@ module Make (E : CharEncoding.T) = struct
   end
 
   module Any = struct
-    let parsers = Audio.parsers @ Image.parsers @ Video.parsers
+    let parsers = Audio.parsers @ Image.parsers @ Video.parsers @ [RIFF.parse]
 
     (** Genering parsing of metadata. *)
     let parse = first_valid parsers
