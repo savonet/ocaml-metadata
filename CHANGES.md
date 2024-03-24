@@ -1,4 +1,4 @@
-0.3.0 (unreleased)
+0.3.0 (2024-03-24)
 =====
 
 - Add basic example.
