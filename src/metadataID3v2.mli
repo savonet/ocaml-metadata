@@ -1,5 +1,8 @@
 (** Parse the ID3v2 header. *)
-val parse : ?recode:MetadataCharEncoding.recode -> MetadataBase.Reader.t -> MetadataBase.metadata
+val parse :
+  ?recode:MetadataCharEncoding.recode ->
+  MetadataBase.Reader.t ->
+  MetadataBase.metadata
 
 (** Parse the ID3v2 header from a file. *)
 val parse_file :
@@ -120,7 +123,8 @@ type text_encoding = [ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ]
 (** Data contained in a frame. *)
 type frame_data = [ `Text of text_encoding * string | `Binary of string ]
 
-type frame_flag = [ `File_alter_preservation of bool | `Tag_alter_perservation of bool ]
+type frame_flag =
+  [ `File_alter_preservation of bool | `Tag_alter_perservation of bool ]
 
 (** Default flags for a frame. *)
 val default_flags : frame_id -> frame_flag list

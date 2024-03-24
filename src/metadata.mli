@@ -12,7 +12,8 @@ module Make : functor (_ : CharEncoding.T) -> sig
   type metadata = (string * string) list
 
   (** Bigarray representation of (large) tags. *)
-  type bigarray = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+  type bigarray =
+    (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
   (** When used, a custom parser can override the default parsing mechanism.
       It is passed the metadata label (without normalization), the expected
@@ -51,10 +52,12 @@ module Make : functor (_ : CharEncoding.T) -> sig
     val reset : t -> unit
 
     (** Specialize a parser to operate on files. *)
-    val with_file : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
+    val with_file :
+      ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
 
     (** Specialize a parser to operate on strings. *)
-    val with_string : ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
+    val with_string :
+      ?custom_parser:custom_parser -> (t -> metadata) -> string -> metadata
   end
 
   (** ID3v1 metadata.*)
@@ -92,7 +95,8 @@ module Make : functor (_ : CharEncoding.T) -> sig
   module ID3 : sig
     val parse : Reader.t -> (string * string) list
 
-    val parse_file : ?custom_parser:custom_parser -> string -> (string * string) list
+    val parse_file :
+      ?custom_parser:custom_parser -> string -> (string * string) list
   end
 
   (** Return the first application which does not raise invalid. *)
@@ -102,21 +106,24 @@ module Make : functor (_ : CharEncoding.T) -> sig
   module Audio : sig
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   (** Image file formats. *)
   module Image : sig
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   (** Video file formats. *)
   module Video : sig
     val parse : Reader.t -> MetadataBase.metadata
 
-    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   (** All support file formats. *)
@@ -125,10 +132,12 @@ module Make : functor (_ : CharEncoding.T) -> sig
     val parse : Reader.t -> MetadataBase.metadata
 
     (** Parse the metadata from a file. *)
-    val parse_file : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_file :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
 
     (** Parse the metadata from a string containing the contents of a file. *)
-    val parse_string : ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+    val parse_string :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
   include module type of Any
