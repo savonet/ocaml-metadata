@@ -142,7 +142,7 @@ module Make : functor (_ : CharEncoding.T) -> sig
       ?custom_parser:custom_parser -> string -> MetadataBase.metadata
   end
 
-  (** All support file formats. *)
+  (** All supported file formats. *)
   module Any : sig
     (** Generic metadata parsing. *)
     val parse : Reader.t -> MetadataBase.metadata
