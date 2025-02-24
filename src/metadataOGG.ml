@@ -79,41 +79,51 @@ let parse f : metadata =
     in
     ("vendor", vendor) :: comments
   in
-  if peek 8 = "OpusHead" then (
-    R.drop f 8;
-    (* version *)
-    let v = R.uint8 f in
-    if v <> 1 then raise Invalid;
-    (* output channels *)
-    let c = R.uint8 f in
-    (* pre-skip *)
-    ignore (R.uint16_le f);
-    (* input samplerate *)
-    ignore (R.uint32_le f);
-    (* output gain *)
-    ignore (R.uint16_le f);
-    (* mapping family *)
-    let mapping_family = R.uint8 f in
-    if mapping_family <> 0 then (
-      (* stream count *)
-      ignore (R.uint8 f);
-      (* coupled count *)
-      ignore (R.uint8 f);
-      (* channel mapping *)
-      ignore (R.read f c));
-    if R.read f 8 <> "OpusTags" then raise Invalid;
-    comments ())
-  else (
-    (* Assume vorbis *)
-    let t = R.uint8 f in
-    (* Packet type *)
-    if R.read f 6 <> "vorbis" then raise Invalid;
-    (* identification header *)
-    assert (t = 1);
-    R.drop f (4 + 1 + 4 + 4 + 4 + 4 + 2);
-    (* comment header *)
-    assert (R.uint8 f = 3);
-    if R.read f 6 <> "vorbis" then raise Invalid;
-    comments ())
+  let stream_type =
+    match (peek 8, peek 7, peek 5) with
+      | "OpusHead", _, _ -> `Opus
+      | _, "\001vorbis", _ -> `Vorbis
+      | _, _, "\127FLAC" -> `Flac
+      | _ -> `Unknown
+  in
+  match stream_type with
+    | `Opus ->
+        R.drop f 8;
+        (* version *)
+        let v = R.uint8 f in
+        if v <> 1 then raise Invalid;
+        (* output channels *)
+        let c = R.uint8 f in
+        (* pre-skip *)
+        ignore (R.uint16_le f);
+        (* input samplerate *)
+        ignore (R.uint32_le f);
+        (* output gain *)
+        ignore (R.uint16_le f);
+        (* mapping family *)
+        let mapping_family = R.uint8 f in
+        if mapping_family <> 0 then (
+          (* stream count *)
+          ignore (R.uint8 f);
+          (* coupled count *)
+          ignore (R.uint8 f);
+          (* channel mapping *)
+          ignore (R.read f c));
+        if R.read f 8 <> "OpusTags" then raise Invalid;
+        comments ()
+    | `Vorbis ->
+        R.drop f 7;
+        R.drop f (4 + 1 + 4 + 4 + 4 + 4 + 2);
+        (* comment header *)
+        assert (R.uint8 f = 3);
+        if R.read f 6 <> "vorbis" then raise Invalid;
+        comments ()
+    | `Flac ->
+        R.drop f 51;
+        (* comment header *)
+        assert (R.uint8 f land 0x7ff = 4);
+        R.drop f 3;
+        comments ()
+    | `Unknown -> []
 
 let parse_file ?custom_parser file = R.with_file ?custom_parser parse file
