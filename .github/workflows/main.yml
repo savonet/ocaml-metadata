@@ -7,9 +7,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Setup OCaml
-      uses: ocaml/setup-ocaml@v2
+      uses: ocaml/setup-ocaml@v3
       with:
-        ocaml-compiler: 5.00
+        ocaml-compiler: 5.3
     - name: Install required packages
       run: sudo apt install ffmpeg
     - name: Pin package
