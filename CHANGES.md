@@ -1,4 +1,4 @@
-0.3.1 (unreleased)
+0.3.1 (2024-04-01) 🃏
 =====
 
 - Add support for `ogg/flac` metadata.
