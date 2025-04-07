@@ -25,7 +25,9 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: _build/default/_doc/_html
+
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build
     permissions:
       pages: write
@@ -37,4 +39,5 @@ jobs:
     steps:
       - name: Deploy website
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
+
