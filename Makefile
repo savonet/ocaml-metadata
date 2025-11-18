@@ -8,3 +8,6 @@ doc:
 
 clean:
 	@dune clean
+
+install:
+	@dune install

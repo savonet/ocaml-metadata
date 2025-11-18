@@ -7,16 +7,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Setup OCaml
-      uses: ocaml/setup-ocaml@v3
-      with:
-        ocaml-compiler: 5.3
+      run: sudo apt install -y ocaml ocaml-dune ocaml-odoc
     - name: Install required packages
-      run: sudo apt install ffmpeg
-    - name: Pin package
-      run: opam pin add -n .
-    - name: Install dependencies
-      run: opam depext -yt metadata
+      run: sudo apt install -y ffmpeg
     - name: Build and install
-      run: opam install -t .
+      run: dune install
     - name: Run tests
       run: eval $(opam env) && dune build @citest
