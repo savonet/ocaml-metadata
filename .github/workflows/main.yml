@@ -11,6 +11,6 @@ jobs:
     - name: Install required packages
       run: sudo apt install -y ffmpeg
     - name: Build and install
-      run: dune install
+      run: dune build @install
     - name: Run tests
       run: eval $(opam env) && dune build @citest
