@@ -3,12 +3,14 @@ let () =
   let format = ref "id3v2" in
   let outfile = ref None in
   Arg.parse
-    [
-      ("-f", Arg.Set_string format, "File format.");
-      ( "-o",
-        Arg.String (fun s -> outfile := Some s),
-        "Output file (default is standard output)." );
-    ]
+    (Arg.align
+       [
+         ("-f", Arg.Set_string format, " File format.");
+         ( "-o",
+           Arg.String (fun s -> outfile := Some s),
+           " Output file (default is standard output)." );
+       ]
+    )
     (fun f -> fname := f)
     "dump [options] file";
   let dump =
