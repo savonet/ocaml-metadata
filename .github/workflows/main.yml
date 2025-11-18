@@ -10,7 +10,7 @@ jobs:
       run: sudo apt install -y ocaml ocaml-dune ocaml-odoc
     - name: Install required packages
       run: sudo apt install -y ffmpeg
-    - name: Build and install
-      run: dune build @install
+    - name: Build
+      run: dune build
     - name: Run tests
-      run: eval $(opam env) && dune build @citest
+      run: dune build @citest
