@@ -112,6 +112,14 @@ module Reader = struct
     let b3 = byte f in
     (b0 lsl 24) + (b1 lsl 16) + (b2 lsl 8) + b3
 
+  let int64_be f =
+    let a = Array.init 8 (fun _ -> Int64.of_int @@ byte f) in
+    let n = ref Int64.zero in
+    for i = 0 to 7 do
+      n := Int64.add (Int64.shift_left !n 8) a.(i)
+    done;
+    !n
+
   let size f = f.size ()
   let reset f = f.reset ()
 

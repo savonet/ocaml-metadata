@@ -24,8 +24,12 @@ let parse f : metadata =
   let rec chunk l =
     let len = R.int32_be f in
     let tag = R.read f 4 in
+    if tag <> "mdat" then assert (len >= 8);
     let tags = tag :: l in
     (match tags with
+      | ["mdat"] when len = 1 ->
+         let len = R.int64_be f in
+         R.drop f (Int64.to_int len)
       | ["moov"]
       | ["udta"; "moov"]
       | ["meta"; "udta"; "moov"]
