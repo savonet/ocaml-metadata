@@ -139,6 +139,10 @@ let parse_metadata content =
   parse 0;
   !ans
 
+let recode s =
+  if String.starts_with ~prefix:"\xfe\xff" s then MetadataCharEncoding.Naive.convert ~source:`UTF_16 s
+  else s
+
 let parse f : metadata =
   if R.read f 5 <> "%PDF-" then raise Invalid;
   (* Find a string of the form "/Info 123 0 R" to obtain object id (123 0). *)
@@ -170,5 +174,6 @@ let parse f : metadata =
   (* Printf.printf "info obj: %s\n%!" obj; *)
   (* Parse the metadata object. *)
   parse_metadata obj
+  |> List.map (fun (k,v) -> k, recode v)
 
 let parse_file ?custom_parser file = R.with_file ?custom_parser parse file
