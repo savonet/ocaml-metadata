@@ -121,7 +121,21 @@ module Reader = struct
     !n
 
   let size f = f.size ()
+
+  (** Reset state like after the file was just opened (position is at the beginning in particular). *)
   let reset f = f.reset ()
+
+  (** Try to find a specific string starting from current position in the file. *)
+  let find f s =
+    (* TODO: more efficient implementation. *)
+    let n = String.length s in
+    try
+      while read f n <> s do
+        f.seek (-(n-1))
+      done;
+      true
+    with
+    | _ -> false
 
   let with_file ?custom_parser f fname =
     let fd = Unix.openfile fname [Unix.O_RDONLY; Unix.O_CLOEXEC] 0o644 in

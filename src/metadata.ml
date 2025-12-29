@@ -14,6 +14,7 @@ module Make (E : CharEncoding.T) = struct
   module MP4 = MetadataMP4
   module WAV = MetadataWAV
   module RIFF = MetadataRIFF
+  module PDF = MetadataPDF
 
   (** Charset conversion function. *)
   let recode = E.convert
@@ -68,8 +69,16 @@ module Make (E : CharEncoding.T) = struct
       Reader.with_file ?custom_parser parse file
   end
 
+  module Text = struct
+    let parsers = [PDF.parse]
+    let parse = first_valid parsers
+
+    let parse_file ?custom_parser file =
+      Reader.with_file ?custom_parser parse file
+  end
+
   module Any = struct
-    let parsers = Audio.parsers @ Image.parsers @ Video.parsers @ [RIFF.parse]
+    let parsers = Audio.parsers @ Image.parsers @ Video.parsers @ Text.parsers @ [RIFF.parse]
 
     (** Genering parsing of metadata. *)
     let parse = first_valid parsers

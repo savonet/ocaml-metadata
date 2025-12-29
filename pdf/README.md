@@ -38,7 +38,7 @@ In a PDF, the very last part of the file (the `trailer`) tells the reader where 
 
 - The Code: `find_info_object_id`
 - Logic:
-  1. It searches backwards from the end of the file for the string /Info.
+  1. It searches backwards from the end of the file for the string `/Info`.
   2. It expects a format like: `/Info 15 0 R`.
   3. `15` is the Object ID, `0` is the Generation ID, and `R` stands for Reference.
   4. It parses and returns the string `"15 0"`.
@@ -62,7 +62,7 @@ Example extraction:
 15 0 obj
 <<
 /Title (Project Report)
-  /Author (Marc Mimram)
+  /Author (Bob Morane)
   /CreationDate (D:20231220140000)
 >>
 endobj
