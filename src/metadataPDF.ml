@@ -166,12 +166,12 @@ let parse f : metadata =
   while R.read f 4 <> "Info" do
     find_slash ()
   done;
-  assert (R.read f 1 = " ");
+  if R.read f 1 <> " " then raise Invalid;
   let read_int () =
     let n = ref "" in
     let s = ref @@ R.read f 1 in
     while !s <> " " do
-      assert (is_digit !s.[0]);
+      if not (is_digit !s.[0]) then raise Invalid;
       n := !n ^ !s;
       s := R.read f 1
     done;
@@ -181,10 +181,10 @@ let parse f : metadata =
   let gen_id = read_int () in
   (* Find the actual object, ie the contents of 123 0 obj ... endobj. *)
   let marker = obj_id ^ " " ^ gen_id ^ " obj" in
-  assert (R.read f 1 = "R");
+  if R.read f 1 <> "R" then raise Invalid;
   R.reset f;
   (* Printf.printf "looking for: %s\n%!" marker; *)
-  assert (find f marker);
+  if not (find f marker) then raise Invalid;
   let obj = R.until f "endobj" in
   (* Printf.printf "info obj: %s\n%!" obj; *)
   (* Parse the metadata object. *)
