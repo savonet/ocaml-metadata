@@ -146,10 +146,10 @@ let recode s =
 (* Find a substring at the beginning of a line *)
 let find f s =
   let n = String.length s in
-  let bol = ref true in
+  let bol = ref false in
   try
-    while !bol && R.read f n <> s do
-      f.seek (-n);
+    while not (!bol && R.read f n = s) do
+      if !bol then f.seek (-n);
       let c = (R.read f 1).[0] in
       bol := (c = '\n' || c = '\r');
     done;
@@ -183,6 +183,7 @@ let parse f : metadata =
   let marker = obj_id ^ " " ^ gen_id ^ " obj" in
   assert (R.read f 1 = "R");
   R.reset f;
+  (* Printf.printf "looking for: %s\n%!" marker; *)
   assert (find f marker);
   let obj = R.until f "endobj" in
   (* Printf.printf "info obj: %s\n%!" obj; *)
