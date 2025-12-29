@@ -2,6 +2,7 @@
 =====
 
 - Improve mp4 parsing (#7).
+- Add support for pdf metadata (#8).
 
 0.3.1 (2024-04-01) 🃏
 =====
