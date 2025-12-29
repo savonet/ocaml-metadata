@@ -143,6 +143,20 @@ let recode s =
   if String.starts_with ~prefix:"\xfe\xff" s then MetadataCharEncoding.Naive.convert ~source:`UTF_16 s
   else MetadataCharEncoding.Naive.convert ~source:`ISO_8859_1 s
 
+(* Find a substring at the beginning of a line *)
+let find f s =
+  let n = String.length s in
+  let bol = ref true in
+  try
+    while !bol && R.read f n <> s do
+      f.seek (-n);
+      let c = (R.read f 1).[0] in
+      bol := (c = '\n' || c = '\r');
+    done;
+    true
+  with
+  | _ -> false
+
 let parse f : metadata =
   if R.read f 5 <> "%PDF-" then raise Invalid;
   (* Find a string of the form "/Info 123 0 R" to obtain object id (123 0). *)
@@ -169,7 +183,7 @@ let parse f : metadata =
   let marker = obj_id ^ " " ^ gen_id ^ " obj" in
   assert (R.read f 1 = "R");
   R.reset f;
-  assert (R.find f marker);
+  assert (find f marker);
   let obj = R.until f "endobj" in
   (* Printf.printf "info obj: %s\n%!" obj; *)
   (* Parse the metadata object. *)
