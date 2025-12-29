@@ -13,7 +13,7 @@ let parse f : metadata =
     let n = ref "" in
     let s = ref @@ R.read f 1 in
     while !s <> " " do
-      assert ('0' <= !s.[0] && !s.[0] <= '0');
+      assert ('0' <= !s.[0] && !s.[0] <= '9');
       n := !n ^ !s;
       s := R.read f 1
     done;
@@ -25,6 +25,8 @@ let parse f : metadata =
   assert (R.read f 1 = "R");
   R.reset f;
   assert (R.find f marker);
+  let obj = R.until f "endobj" in
+  Printf.printf "info obj: %s\n%!" obj;
   []
 
 let parse_file ?custom_parser file = R.with_file ?custom_parser parse file

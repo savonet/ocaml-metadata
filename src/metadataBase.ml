@@ -137,6 +137,17 @@ module Reader = struct
     with
     | _ -> false
 
+  (** Return the contents until we reach a specific string (not included). *)
+  let until f s =
+    (* TODO: more efficient implementation. *)
+    let n = String.length s in
+    let ans = ref "" in
+    while read f n <> s do
+      f.seek (-n);
+      ans := !ans ^ read f 1
+    done;
+    !ans
+
   let with_file ?custom_parser f fname =
     let fd = Unix.openfile fname [Unix.O_RDONLY; Unix.O_CLOEXEC] 0o644 in
     let file =
