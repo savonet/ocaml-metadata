@@ -141,7 +141,7 @@ let parse_metadata content =
 
 let recode s =
   if String.starts_with ~prefix:"\xfe\xff" s then MetadataCharEncoding.Naive.convert ~source:`UTF_16 s
-  else s
+  else MetadataCharEncoding.Naive.convert ~source:`ISO_8859_1 s
 
 let parse f : metadata =
   if R.read f 5 <> "%PDF-" then raise Invalid;
