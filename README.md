@@ -7,6 +7,7 @@ supported:
 - audio formats: ID3v1 and ID3v2 (for mp3), ogg/vorbis, ogg/opus, flac and wav
 - image formats: jpeg and png
 - video formats: mp4 and avi
+- text formats: pdf
 
 Usage
 -----

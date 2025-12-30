@@ -100,6 +100,9 @@ module Make : functor (_ : CharEncoding.T) -> sig
   (** RIFF metdata. *)
   module RIFF = MetadataRIFF
 
+  (** PDF metadata. *)
+  module PDF = MetadataPDF
+
   (** Convert the charset encoding of a string. *)
   val recode :
     ?source:[ `ISO_8859_1 | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ] ->
@@ -136,6 +139,14 @@ module Make : functor (_ : CharEncoding.T) -> sig
 
   (** Video file formats. *)
   module Video : sig
+    val parse : Reader.t -> MetadataBase.metadata
+
+    val parse_file :
+      ?custom_parser:custom_parser -> string -> MetadataBase.metadata
+  end
+
+  (** Text file formats. *)
+  module Text : sig
     val parse : Reader.t -> MetadataBase.metadata
 
     val parse_file :

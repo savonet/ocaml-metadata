@@ -40,7 +40,9 @@
   ; test.mkv
   ; test.webm
   test.wav
-  (glob_files id3v2/*.mp3))
+  (glob_files id3v2/*.mp3)
+  (glob_files pdf/*.pdf)
+ )
  (action
   (progn
    (run ./basic.exe)
