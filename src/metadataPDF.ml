@@ -46,6 +46,7 @@ let decode_literal_string content =
             | 'f' -> Buffer.add_char b '\012'; loop (i + 2)
             | '(' -> Buffer.add_char b '('; loop (i + 2)
             | ')' -> Buffer.add_char b ')'; loop (i + 2)
+            | '\r' -> loop (i + 2)
             | '\\' -> Buffer.add_char b '\\'; loop (i + 2)
             | d when is_digit d -> (* Octal \ddd *)
                let end_oct = min (i + 4) len in
