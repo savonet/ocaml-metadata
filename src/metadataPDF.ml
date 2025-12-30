@@ -148,13 +148,14 @@ let recode s =
 
 (* Find a substring at the beginning of a line *)
 let find f s =
+  let is_newline c = c = '\r' || c = '\n' in
+  let find_newline () = while not (is_newline @@ (R.read f 1).[0]) do () done in
   let n = String.length s in
-  let bol = ref false in
   try
-    while not (!bol && R.read f n = s) do
-      if !bol then f.seek (-n);
-      let c = (R.read f 1).[0] in
-      bol := (c = '\n' || c = '\r');
+    find_newline ();
+    while not (R.read f n = s) do
+      f.seek (-(n-1));
+      find_newline ()
     done;
     true
   with
