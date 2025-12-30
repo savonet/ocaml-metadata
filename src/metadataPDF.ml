@@ -1,7 +1,9 @@
 open MetadataBase
 module R = Reader
 
-let is_digit c = c >= '0' && c <= '9'
+let is_digit c = '0' <= c && c <= '9'
+
+let is_octal_digit c = '0' <= c && c <= '7'
 
 let is_space c = c = ' ' || c = '\t' || c = '\r' || c = '\n' || c = '\012'
 
@@ -26,7 +28,7 @@ let decode_hex_string content =
 
 (* Decode Literal String: (Hello\nWorld) -> "Hello\nWorld" *)
 let decode_literal_string content =
-  let b = Buffer.create (String.length content) in
+  let b = Buffer.create @@ String.length content in
   let len = String.length content in
   let rec loop i =
     if i >= len then Buffer.contents b
@@ -51,7 +53,7 @@ let decode_literal_string content =
                (* Take up to 3 digits *)
                let oct_len =
                  let rec count k =
-                   if k < String.length oct_str && is_digit oct_str.[k] then count (k+1)
+                   if k < String.length oct_str && is_octal_digit oct_str.[k] then count (k+1)
                    else k
                  in
                  count 0
