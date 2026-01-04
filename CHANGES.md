@@ -1,4 +1,4 @@
-0.3.2 (unreleased)
+0.3.2 (2025-01-04)
 =====
 
 - Improve mp4 parsing (#7).
