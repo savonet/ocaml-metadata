@@ -1,5 +1,9 @@
-The metadata library
-====================
+# The metadata library
+
+> [!WARNING]
+> This repository is read-only. All changes must be made in
+> [savonet/liquidsoap](https://github.com/savonet/liquidsoap) under
+> `src/modules/synced/metadata/` and will be mirrored here automatically.
 
 A pure OCaml library to read metadata from various formats. For now, are
 supported:
@@ -9,8 +13,7 @@ supported:
 - video formats: mp4 and avi
 - text formats: pdf
 
-Usage
------
+## Usage
 
 Basic usage is
 
@@ -24,8 +27,7 @@ In the above example, the function `Metadata.parse_file` takes a file name as
 argument and returns an association list describing its metadata. It consists of
 pairs of strings being the name of the metadata and its value.
 
-Installing
-----------
+## Installing
 
 The preferred way is via opam:
 
@@ -33,8 +35,7 @@ The preferred way is via opam:
 opam install metadata
 ```
 
-Other libraries
----------------
+## Other libraries
 
 - [ocaml-taglib](https://github.com/savonet/ocaml-taglib): for tags from audio
   files (mp3, ogg, etc.)
